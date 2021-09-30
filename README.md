@@ -6,3 +6,8 @@ Environment can be setup using Conda:
 conda env create -f environment.yml
 conda activate ser-bias
 ```
+
+## Train Simple Model
+```
+python -m train_simple_model
+```
