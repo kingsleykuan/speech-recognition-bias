@@ -1,6 +1,8 @@
 name: ser-bias
 channels:
   - conda-forge
+  - pytorch
+  - nvidia
 dependencies:
   - python=3.9
   - flake8
@@ -17,3 +19,8 @@ dependencies:
   - numba
   - pydub
   - librosa
+  - pytorch
+  - torchvision
+  - torchaudio
+  - cudatoolkit=11.1
+  - tensorboard
