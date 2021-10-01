@@ -19,7 +19,6 @@ class BaseTrainer(ABC):
             learning_rate=1e-3,
             weight_decay=0,
             log_dir=None,
-            log_comment='',
             save_path=None):
         self.data_loader_train = data_loader_train
         self.data_loader_eval = data_loader_eval
@@ -34,7 +33,6 @@ class BaseTrainer(ABC):
         self.weight_decay = weight_decay
 
         self.log_dir = log_dir
-        self.log_comment = log_comment
 
         self.save_path = save_path
 
@@ -49,8 +47,7 @@ class BaseTrainer(ABC):
             weight_decay=self.weight_decay)
 
         if log_dir is not None:
-            self.writer = SummaryWriter(
-                log_dir=self.log_dir, comment=self.log_comment)
+            self.writer = SummaryWriter(log_dir=self.log_dir)
         else:
             self.writer = None
 

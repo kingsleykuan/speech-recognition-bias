@@ -12,8 +12,9 @@ data_path_val = 'Data/MelSpecSplit/val'
 demographics_csv_path = 'Data/VideoDemographics.csv'
 ratings_csv_path = 'Data/processedResults/summaryTable.csv'
 save_path = 'models/simple'
+log_dir = 'runs/simple'
 use_ratings = False
-num_epochs = 20
+num_epochs = 50
 steps_per_log = 100
 epochs_per_eval = 5
 batch_size = 32
@@ -44,7 +45,7 @@ def load_data(
 
 
 def load_model():
-    model = SimpleModel(128 * 130, 256, 6, dropout_rate=0.1)
+    model = SimpleModel(128 * 130, 2048, 6, dropout_rate=0.8)
     return model
 
 
@@ -61,7 +62,6 @@ class SimpleTrainer(Trainer):
             learning_rate=1e-3,
             weight_decay=0,
             log_dir=None,
-            log_comment='',
             save_path=None,
             use_ratings=False):
         super().__init__(
@@ -75,7 +75,6 @@ class SimpleTrainer(Trainer):
             learning_rate=learning_rate,
             weight_decay=weight_decay,
             log_dir=log_dir,
-            log_comment=log_comment,
             save_path=save_path)
         self.use_ratings = use_ratings
         self.current_f1_score = float('-inf')
@@ -153,6 +152,7 @@ def main(
         demographics_csv_path,
         ratings_csv_path,
         save_path,
+        log_dir=None,
         use_ratings=False,
         num_epochs=20,
         steps_per_log=100,
@@ -191,6 +191,7 @@ def main(
         epochs_per_eval=epochs_per_eval,
         learning_rate=learning_rate,
         weight_decay=weight_decay,
+        log_dir=log_dir,
         save_path=save_path,
         use_ratings=use_ratings)
 
@@ -204,6 +205,7 @@ if __name__ == '__main__':
         demographics_csv_path,
         ratings_csv_path,
         save_path,
+        log_dir=log_dir,
         use_ratings=use_ratings,
         num_epochs=num_epochs,
         steps_per_log=steps_per_log,
