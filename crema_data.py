@@ -73,6 +73,8 @@ class CremaAudioDataset(Dataset):
         log_mel_spec = self.data[idx]
         metadata = self.metadata.iloc[idx]
 
+        filename = metadata['filename']
+
         emotion = metadata['emotion']
         emotion_label = np.zeros(len(self.emotion_to_id), dtype=np.float32)
         emotion_label[self.emotion_to_id[emotion]] = 1
@@ -91,6 +93,7 @@ class CremaAudioDataset(Dataset):
         race_label = np.asarray(self.race_to_id[race], dtype=np.float32)
 
         data = {
+            'filename': filename,
             'log_mel_spec': log_mel_spec,
             'emotion_label': emotion_label,
             'emotion_rating_labels': emotion_rating_labels,
