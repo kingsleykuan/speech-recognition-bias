@@ -3,9 +3,10 @@
 import argparse
 from pathlib import Path
 
-import pandas as pd
 from shutil import copy2
 from sklearn.model_selection import train_test_split
+
+from crema_metadata import read_actor_demographics, read_metadata
 
 
 def arg_parser():
@@ -32,28 +33,12 @@ def arg_parser():
 
 
 def split_dataset(data_path, demographics_csv_path, train_size, val_size):
-    actor_demographics = pd.read_csv(
-        demographics_csv_path,
-        sep=',',
-        header=0,
-        usecols=('ActorID', 'Sex', 'Race'))
-    actor_demographics = actor_demographics.rename(
-        columns={'ActorID': 'actor_id', 'Sex': 'sex', 'Race': 'race'})
+    actor_demographics = read_actor_demographics(demographics_csv_path)
     actor_demographics['sex_race'] = \
         actor_demographics['sex'] + ' ' + actor_demographics['race']
 
     data_path = Path(data_path)
-    data_paths = list(data_path.glob('*.wav'))
-    data_attributs = [path.stem.split('_') for path in data_paths]
-
-    dataset = [
-        [path] + attributs
-        for path, attributs in zip(data_paths, data_attributs)]
-    dataset = pd.DataFrame(
-        dataset,
-        columns=('path', 'actor_id', 'sentence', 'emotion', 'emotion_level'))
-    dataset['actor_id'] = pd.to_numeric(dataset['actor_id'])
-
+    dataset = read_metadata(data_path)
     dataset = dataset.merge(
         actor_demographics, how='inner', on='actor_id', validate='many_to_one')
 
