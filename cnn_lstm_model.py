@@ -10,7 +10,6 @@ LFLB_DEFAULT_CONFIG = [
         'input_channels': 1,
         'output_channels': 64,
         'conv_kernel_size': 3,
-        'conv_stride': 1,
         'pooling_kernel_size': 2,
         'pooling_stride': 2,
         'dropout_rate': 0.1,
@@ -19,27 +18,24 @@ LFLB_DEFAULT_CONFIG = [
         'input_channels': 64,
         'output_channels': 64,
         'conv_kernel_size': 3,
-        'conv_stride': 1,
-        'pooling_kernel_size': 4,
-        'pooling_stride': 4,
+        'pooling_kernel_size': [4, 2],
+        'pooling_stride': [4, 2],
         'dropout_rate': 0.1,
     },
     {
         'input_channels': 64,
         'output_channels': 128,
         'conv_kernel_size': 3,
-        'conv_stride': 1,
-        'pooling_kernel_size': 4,
-        'pooling_stride': 4,
+        'pooling_kernel_size': [4, 2],
+        'pooling_stride': [4, 2],
         'dropout_rate': 0.1,
     },
     {
         'input_channels': 128,
         'output_channels': 128,
         'conv_kernel_size': 3,
-        'conv_stride': 1,
-        'pooling_kernel_size': 4,
-        'pooling_stride': 4,
+        'pooling_kernel_size': [4, 2],
+        'pooling_stride': [4, 2],
         'dropout_rate': 0.1,
     },
 ]
@@ -51,7 +47,6 @@ class LocalFeatureLearningBlock2D(nn.Module):
             input_channels,
             output_channels,
             conv_kernel_size,
-            conv_stride,
             pooling_kernel_size,
             pooling_stride,
             dropout_rate=0.1,
@@ -62,7 +57,6 @@ class LocalFeatureLearningBlock2D(nn.Module):
             input_channels,
             output_channels,
             conv_kernel_size,
-            conv_stride,
             padding='same',
             bias=False)
         self.batch_norm = nn.BatchNorm2d(output_channels)
@@ -96,7 +90,7 @@ class CNNLSTM2DModel(BaseModel):
             self,
             lflb_config=None,
             lstm_input_size=128,
-            lstm_output_size=256,
+            lstm_output_size=128,
             output_size=6,
             label_smoothing=0.1,
             **kwargs):
@@ -114,8 +108,9 @@ class CNNLSTM2DModel(BaseModel):
         self.lflbs = nn.Sequential(*[
             LocalFeatureLearningBlock2D(**config)
             for config in self.lflb_config])
-        self.lstm = nn.LSTM(self.lstm_input_size, self.lstm_output_size)
-        self.fc = nn.Linear(self.lstm_output_size, self.output_size)
+        self.lstm = nn.LSTM(
+            self.lstm_input_size, self.lstm_output_size, bidirectional=True)
+        self.fc = nn.Linear(self.lstm_output_size * 2, self.output_size)
 
         self.init_parameters()
 

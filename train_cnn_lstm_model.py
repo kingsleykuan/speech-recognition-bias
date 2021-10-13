@@ -18,7 +18,7 @@ epochs_per_eval = 5
 batch_size = 64
 num_workers = 4
 learning_rate = 1e-3
-weight_decay = 1e-4
+weight_decay = 1e-5
 random_seed = 0
 
 
@@ -64,6 +64,7 @@ def main(
         weight_decay=1e-5,
         random_seed=0):
     torch.manual_seed(random_seed)
+    torch.backends.cudnn.benchmark = True
 
     data_loader_train = load_data(
         data_path_train,
