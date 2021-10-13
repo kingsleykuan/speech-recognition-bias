@@ -3,7 +3,7 @@ from sklearn.metrics import classification_report, f1_score
 from torch.utils.data import DataLoader
 
 from crema_data import CremaAudioDataset
-from model import SimpleModel
+from simple_model import SimpleModel
 from trainer import Trainer
 from utils import recursive_to_device
 
