@@ -11,5 +11,17 @@ conda activate ser-bias
 ```
 python -m train_simple_model
 ```
-Macro F1-Score (Acted Emotion): 0.51045
-Macro F1-Score (Observed Emotion): 0.44372
+| Annotation Type  | Macro F1-Score |
+|------------------|----------------|
+| Acted Emotion    | 0.51045        |
+| Observed Emotion | 0.44372        |
+
+## Train 2D CNN LSTM Model
+```
+python -m train_cnn_lstm_model
+```
+
+| Annotation Type  | Macro F1-Score |
+|------------------|----------------|
+| Acted Emotion    | 0.64529        |
+| Observed Emotion | 0.50023        |
