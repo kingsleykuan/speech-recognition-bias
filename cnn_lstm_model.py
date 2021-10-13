@@ -13,6 +13,7 @@ LFLB_DEFAULT_CONFIG = [
         'conv_stride': 1,
         'pooling_kernel_size': 2,
         'pooling_stride': 2,
+        'dropout_rate': 0.1,
     },
     {
         'input_channels': 64,
@@ -21,6 +22,7 @@ LFLB_DEFAULT_CONFIG = [
         'conv_stride': 1,
         'pooling_kernel_size': 4,
         'pooling_stride': 4,
+        'dropout_rate': 0.1,
     },
     {
         'input_channels': 64,
@@ -29,6 +31,7 @@ LFLB_DEFAULT_CONFIG = [
         'conv_stride': 1,
         'pooling_kernel_size': 4,
         'pooling_stride': 4,
+        'dropout_rate': 0.1,
     },
     {
         'input_channels': 128,
@@ -37,6 +40,7 @@ LFLB_DEFAULT_CONFIG = [
         'conv_stride': 1,
         'pooling_kernel_size': 4,
         'pooling_stride': 4,
+        'dropout_rate': 0.1,
     },
 ]
 
@@ -50,6 +54,7 @@ class LocalFeatureLearningBlock2D(nn.Module):
             conv_stride,
             pooling_kernel_size,
             pooling_stride,
+            dropout_rate=0.1,
             **kwargs):
         super(LocalFeatureLearningBlock2D, self).__init__()
 
@@ -63,6 +68,7 @@ class LocalFeatureLearningBlock2D(nn.Module):
         self.batch_norm = nn.BatchNorm2d(output_channels)
         self.activation = nn.ELU()
         self.pooling = nn.MaxPool2d(pooling_kernel_size, pooling_stride)
+        self.dropout = nn.Dropout2d(dropout_rate)
 
         self.init_parameters()
 
@@ -81,6 +87,7 @@ class LocalFeatureLearningBlock2D(nn.Module):
         features = self.batch_norm(features)
         features = self.activation(features)
         features = self.pooling(features)
+        features = self.dropout(features)
         return features
 
 
