@@ -18,7 +18,7 @@ epochs_per_eval = 5
 batch_size = 64
 num_workers = 4
 learning_rate = 1e-3
-weight_decay = 1e-3
+weight_decay = 1e-4
 random_seed = 0
 
 
@@ -43,7 +43,7 @@ def load_data(
 
 
 def load_model():
-    model = CNNLSTM2DModel(output_size=6)
+    model = CNNLSTM2DModel(output_size=6, label_smoothing=0.1)
     return model
 
 

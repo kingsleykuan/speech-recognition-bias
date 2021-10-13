@@ -43,7 +43,8 @@ def load_data(
 
 
 def load_model():
-    model = SimpleModel(128 * 130, 2048, 6, dropout_rate=0.8)
+    model = SimpleModel(
+        128 * 130, 2048, 6, dropout_rate=0.8, label_smoothing=0.0)
     return model
 
 

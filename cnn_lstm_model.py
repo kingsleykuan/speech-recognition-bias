@@ -91,6 +91,7 @@ class CNNLSTM2DModel(BaseModel):
             lstm_input_size=128,
             lstm_output_size=256,
             output_size=6,
+            label_smoothing=0.1,
             **kwargs):
         super(CNNLSTM2DModel, self).__init__()
 
@@ -100,6 +101,7 @@ class CNNLSTM2DModel(BaseModel):
         self.lstm_input_size = lstm_input_size
         self.lstm_output_size = lstm_output_size
         self.output_size = output_size
+        self.label_smoothing = label_smoothing
 
         self.batch_norm_input = nn.BatchNorm2d(1)
         self.lflbs = nn.Sequential(*[
@@ -116,6 +118,7 @@ class CNNLSTM2DModel(BaseModel):
             'lstm_input_size': self.lstm_input_size,
             'lstm_output_size': self.lstm_output_size,
             'output_size': self.output_size,
+            'label_smoothing': self.label_smoothing,
         }
         return config
 
@@ -137,6 +140,7 @@ class CNNLSTM2DModel(BaseModel):
             self.init_parameters()
 
     def loss(self, features, labels):
+        labels = torch.abs(labels - self.label_smoothing)
         loss = F.binary_cross_entropy_with_logits(features, labels)
         return loss
 
