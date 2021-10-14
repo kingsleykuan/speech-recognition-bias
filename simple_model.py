@@ -12,6 +12,7 @@ class SimpleModel(BaseModel):
             hidden_size,
             output_size,
             dropout_rate=0.1,
+            label_smoothing=0.1,
             **kwargs):
         super(SimpleModel, self).__init__()
 
@@ -19,6 +20,7 @@ class SimpleModel(BaseModel):
         self.hidden_size = hidden_size
         self.output_size = output_size
         self.dropout_rate = dropout_rate
+        self.label_smoothing = label_smoothing
 
         self.batch_norm_input = nn.BatchNorm1d(self.input_size)
 
@@ -40,6 +42,7 @@ class SimpleModel(BaseModel):
             'hidden_size': self.hidden_size,
             'output_size': self.output_size,
             'dropout_rate': self.dropout_rate,
+            'label_smoothing': self.label_smoothing,
         }
         return config
 
@@ -64,6 +67,7 @@ class SimpleModel(BaseModel):
         self.init_parameters()
 
     def loss(self, features, labels):
+        labels = torch.abs(labels - self.label_smoothing)
         loss = F.binary_cross_entropy_with_logits(features, labels)
         return loss
 

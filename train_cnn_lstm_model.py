@@ -3,22 +3,22 @@ from torch.utils.data import DataLoader
 
 from crema_data import CremaAudioDataset
 from ser_trainer import SpeechEmotionRecognitionTrainer
-from simple_model import SimpleModel
+from cnn_lstm_model import CNNLSTM2DModel
 
 data_path_train = 'Data/MelSpecSplit/train'
 data_path_val = 'Data/MelSpecSplit/val'
 demographics_csv_path = 'Data/VideoDemographics.csv'
 ratings_csv_path = 'Data/processedResults/summaryTable.csv'
-save_path = 'models/simple'
-log_dir = 'runs/simple'
+save_path = 'models/cnn_lstm'
+log_dir = 'runs/cnn_lstm'
 use_ratings = False
 num_epochs = 50
-steps_per_log = 100
+steps_per_log = 50
 epochs_per_eval = 5
-batch_size = 32
+batch_size = 64
 num_workers = 4
 learning_rate = 1e-3
-weight_decay = 1e-4
+weight_decay = 1e-5
 random_seed = 0
 
 
@@ -43,8 +43,7 @@ def load_data(
 
 
 def load_model():
-    model = SimpleModel(
-        128 * 130, 2048, 6, dropout_rate=0.8, label_smoothing=0.0)
+    model = CNNLSTM2DModel(output_size=6, label_smoothing=0.1)
     return model
 
 
@@ -65,6 +64,7 @@ def main(
         weight_decay=1e-5,
         random_seed=0):
     torch.manual_seed(random_seed)
+    torch.backends.cudnn.benchmark = True
 
     data_loader_train = load_data(
         data_path_train,
