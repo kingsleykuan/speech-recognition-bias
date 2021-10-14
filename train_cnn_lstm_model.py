@@ -19,6 +19,7 @@ batch_size = 64
 num_workers = 4
 learning_rate = 1e-3
 weight_decay = 1e-5
+use_self_attention = True
 random_seed = 0
 
 
@@ -42,8 +43,11 @@ def load_data(
     return data_loader
 
 
-def load_model():
-    model = CNNLSTM2DModel(output_size=6, label_smoothing=0.1)
+def load_model(use_self_attention=False):
+    model = CNNLSTM2DModel(
+        output_size=6,
+        use_self_attention=use_self_attention,
+        label_smoothing=0.1)
     return model
 
 
@@ -62,6 +66,7 @@ def main(
         num_workers=4,
         learning_rate=1e-3,
         weight_decay=1e-5,
+        use_self_attention=False,
         random_seed=0):
     torch.manual_seed(random_seed)
     torch.backends.cudnn.benchmark = True
@@ -82,7 +87,7 @@ def main(
         num_workers=num_workers,
         shuffle=False)
 
-    model = load_model()
+    model = load_model(use_self_attention=use_self_attention)
 
     trainer = SpeechEmotionRecognitionTrainer(
         data_loader_train,
@@ -116,4 +121,5 @@ if __name__ == '__main__':
         num_workers=num_workers,
         learning_rate=learning_rate,
         weight_decay=weight_decay,
+        use_self_attention=use_self_attention,
         random_seed=random_seed)
