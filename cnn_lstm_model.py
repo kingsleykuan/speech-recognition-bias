@@ -85,12 +85,58 @@ class LocalFeatureLearningBlock2D(nn.Module):
         return features
 
 
+class SelfAttention(nn.Module):
+    def __init__(self, input_size, hidden_size, num_heads):
+        super(SelfAttention, self).__init__()
+
+        self.fc_hidden = nn.Linear(input_size, hidden_size, bias=False)
+        self.activation = nn.ELU()
+        self.fc_attention_heads = nn.ModuleList([
+            nn.Linear(hidden_size, 1, bias=False) for i in range(num_heads)])
+
+        self.init_parameters()
+
+    def init_parameters(self):
+        with torch.no_grad():
+            nn.init.kaiming_uniform_(
+                self.fc_hidden.weight, nonlinearity='relu')
+
+            for fc_attention_head in self.fc_attention_heads:
+                nn.init.kaiming_uniform_(
+                    fc_attention_head.weight, nonlinearity='linear')
+
+    def reset_parameters(self):
+        with torch.no_grad():
+            self.fc_hidden.reset_parameters()
+            for fc_attention_head in self.fc_attention_heads:
+                fc_attention_head.reset_parameters()
+            self.init_parameters()
+
+    def forward(self, features):
+        attention_features = self.fc_hidden(features)
+        attention_features = self.activation(attention_features)
+
+        attention_heads_scores = [
+            F.softmax(fc_attention_head(attention_features), dim=0)
+            for fc_attention_head in self.fc_attention_heads]
+
+        features = [
+            torch.sum(attention_scores * features, dim=0)
+            for attention_scores in attention_heads_scores]
+
+        features = torch.cat(features, dim=-1)
+        return features
+
+
 class CNNLSTM2DModel(BaseModel):
     def __init__(
             self,
             lflb_config=None,
             lstm_input_size=128,
             lstm_output_size=128,
+            use_self_attention=False,
+            self_attention_size=128,
+            num_self_attention_heads=8,
             output_size=6,
             label_smoothing=0.1,
             **kwargs):
@@ -101,16 +147,31 @@ class CNNLSTM2DModel(BaseModel):
         self.lflb_config = lflb_config
         self.lstm_input_size = lstm_input_size
         self.lstm_output_size = lstm_output_size
+        self.use_self_attention = use_self_attention
+        self.self_attention_size = self_attention_size
+        self.num_self_attention_heads = num_self_attention_heads
         self.output_size = output_size
         self.label_smoothing = label_smoothing
 
         self.batch_norm_input = nn.BatchNorm2d(1)
+
         self.lflbs = nn.Sequential(*[
             LocalFeatureLearningBlock2D(**config)
             for config in self.lflb_config])
+
         self.lstm = nn.LSTM(
             self.lstm_input_size, self.lstm_output_size, bidirectional=True)
-        self.fc = nn.Linear(self.lstm_output_size * 2, self.output_size)
+
+        if self.use_self_attention:
+            self.self_attention = SelfAttention(
+                self.lstm_output_size * 2,
+                self.self_attention_size,
+                self.num_self_attention_heads)
+
+        fc_input_size = self.lstm_output_size * 2
+        if self.use_self_attention:
+            fc_input_size = fc_input_size * self.num_self_attention_heads
+        self.fc = nn.Linear(fc_input_size, self.output_size)
 
         self.init_parameters()
 
@@ -119,6 +180,9 @@ class CNNLSTM2DModel(BaseModel):
             'lflb_config': self.lflb_config,
             'lstm_input_size': self.lstm_input_size,
             'lstm_output_size': self.lstm_output_size,
+            'use_self_attention': self.use_self_attention,
+            'self_attention_size': self.self_attention_size,
+            'num_self_attention_heads': self.num_self_attention_heads,
             'output_size': self.output_size,
             'label_smoothing': self.label_smoothing,
         }
@@ -137,6 +201,10 @@ class CNNLSTM2DModel(BaseModel):
                 lflb.reset_parameters()
 
             self.lstm.reset_parameters()
+
+            if self.use_self_attention:
+                self.self_attention.reset_parameters()
+
             self.fc.reset_parameters()
 
             self.init_parameters()
@@ -158,7 +226,11 @@ class CNNLSTM2DModel(BaseModel):
             features, (features.shape[0], features.shape[1], -1))
         lstm_output, (hidden_state_n, cell_state_n) = self.lstm(features)
 
-        features = lstm_output[-1]
+        if self.use_self_attention:
+            features = self.self_attention(lstm_output)
+        else:
+            features = lstm_output[-1]
+
         features = self.fc(features)
 
         outputs = {
