@@ -167,6 +167,8 @@ class CNNLSTM2DModel(BaseModel):
                 self.self_attention_size,
                 self.num_self_attention_heads)
 
+        self.dropout = nn.Dropout(dropout_rate)
+
         fc_input_size = self.lstm_hidden_size * 2
         if self.use_self_attention:
             fc_input_size = fc_input_size * self.num_self_attention_heads
@@ -231,6 +233,7 @@ class CNNLSTM2DModel(BaseModel):
         else:
             features = lstm_output[-1]
 
+        features = self.dropout(features)
         features = self.fc(features)
 
         outputs = {
