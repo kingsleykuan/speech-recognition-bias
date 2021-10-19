@@ -12,7 +12,6 @@ LFLB_DEFAULT_CONFIG = [
         'conv_kernel_size': 3,
         'pooling_kernel_size': 2,
         'pooling_stride': 2,
-        'dropout_rate': 0.1,
     },
     {
         'input_channels': 64,
@@ -20,7 +19,6 @@ LFLB_DEFAULT_CONFIG = [
         'conv_kernel_size': 3,
         'pooling_kernel_size': [4, 2],
         'pooling_stride': [4, 2],
-        'dropout_rate': 0.1,
     },
     {
         'input_channels': 64,
@@ -28,7 +26,6 @@ LFLB_DEFAULT_CONFIG = [
         'conv_kernel_size': 3,
         'pooling_kernel_size': [4, 2],
         'pooling_stride': [4, 2],
-        'dropout_rate': 0.1,
     },
     {
         'input_channels': 128,
@@ -36,7 +33,6 @@ LFLB_DEFAULT_CONFIG = [
         'conv_kernel_size': 3,
         'pooling_kernel_size': [4, 2],
         'pooling_stride': [4, 2],
-        'dropout_rate': 0.1,
     },
 ]
 
@@ -133,11 +129,12 @@ class CNNLSTM2DModel(BaseModel):
             self,
             lflb_config=None,
             lstm_input_size=128,
-            lstm_output_size=128,
+            lstm_hidden_size=256,
             use_self_attention=False,
-            self_attention_size=128,
+            self_attention_size=256,
             num_self_attention_heads=8,
             output_size=6,
+            dropout_rate=0.1,
             label_smoothing=0.1,
             **kwargs):
         super(CNNLSTM2DModel, self).__init__()
@@ -146,29 +143,31 @@ class CNNLSTM2DModel(BaseModel):
             lflb_config = LFLB_DEFAULT_CONFIG
         self.lflb_config = lflb_config
         self.lstm_input_size = lstm_input_size
-        self.lstm_output_size = lstm_output_size
+        self.lstm_hidden_size = lstm_hidden_size
         self.use_self_attention = use_self_attention
         self.self_attention_size = self_attention_size
         self.num_self_attention_heads = num_self_attention_heads
         self.output_size = output_size
+        self.dropout_rate = dropout_rate
         self.label_smoothing = label_smoothing
 
         self.batch_norm_input = nn.BatchNorm2d(1)
 
         self.lflbs = nn.Sequential(*[
-            LocalFeatureLearningBlock2D(**config)
+            LocalFeatureLearningBlock2D(
+                **config, dropout_rate=self.dropout_rate)
             for config in self.lflb_config])
 
         self.lstm = nn.LSTM(
-            self.lstm_input_size, self.lstm_output_size, bidirectional=True)
+            self.lstm_input_size, self.lstm_hidden_size, bidirectional=True)
 
         if self.use_self_attention:
             self.self_attention = SelfAttention(
-                self.lstm_output_size * 2,
+                self.lstm_hidden_size * 2,
                 self.self_attention_size,
                 self.num_self_attention_heads)
 
-        fc_input_size = self.lstm_output_size * 2
+        fc_input_size = self.lstm_hidden_size * 2
         if self.use_self_attention:
             fc_input_size = fc_input_size * self.num_self_attention_heads
         self.fc = nn.Linear(fc_input_size, self.output_size)
@@ -179,11 +178,12 @@ class CNNLSTM2DModel(BaseModel):
         config = {
             'lflb_config': self.lflb_config,
             'lstm_input_size': self.lstm_input_size,
-            'lstm_output_size': self.lstm_output_size,
+            'lstm_hidden_size': self.lstm_hidden_size,
             'use_self_attention': self.use_self_attention,
             'self_attention_size': self.self_attention_size,
             'num_self_attention_heads': self.num_self_attention_heads,
             'output_size': self.output_size,
+            'dropout_rate': self.dropout_rate,
             'label_smoothing': self.label_smoothing,
         }
         return config
