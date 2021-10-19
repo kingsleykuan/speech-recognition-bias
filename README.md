@@ -11,17 +11,24 @@ conda activate ser-bias
 ```
 python -m train_simple_model
 ```
-| Annotation Type  | Macro F1-Score |
-|------------------|----------------|
-| Acted Emotion    | 0.51045        |
-| Observed Emotion | 0.44372        |
 
 ## Train 2D CNN LSTM Model
 ```
 python -m train_cnn_lstm_model
 ```
 
-| Annotation Type  | Macro F1-Score |
-|------------------|----------------|
-| Acted Emotion    | 0.64529        |
-| Observed Emotion | 0.50023        |
+## Models Trained on Acted Emotion Labels (Validation Set)
+| Model                        | Macro F1-Score |
+|------------------------------|----------------|
+| Dense                        | 0.50927        |
+| CNN LSTM                     | 0.65964        |
+| CNN LSTM Attention           | 0.66651        |
+| CNN LSTM Attention Multitask | 0.68006        |
+
+## Models Trained on Observed Emotion Labels (Validation Set)
+| Model                        | Macro F1-Score |
+|------------------------------|----------------|
+| Dense                        | 0.45105        |
+| CNN LSTM                     | 0.50542        |
+| CNN LSTM Attention           | 0.51589        |
+| CNN LSTM Attention Multitask | 0.51678        |
