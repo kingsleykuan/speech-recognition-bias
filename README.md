@@ -53,3 +53,10 @@ python -m classify_emotions \
 --predict_gender \
 --predict_race
 ```
+
+## Speech Emotion Recognition Demo
+```
+python -m ser_demo \
+--model_path 'models/acted/cnn_lstm_attention_multitask' \
+--audio_path 'Data/AudioWAV/1001_DFA_ANG_XX.wav'
+```
