@@ -127,11 +127,14 @@ def classify_emotions(
     filenames, predictions = predict_emotions(data_loader, model)
 
     labels = list(data_loader.dataset.emotions)
+    
+    """
     if predict_gender:
         labels.append('Female')
     if predict_race:
         labels.append('Non-Caucasian')
-
+    """
+    
     data = pd.DataFrame(predictions, columns=labels)
     data.insert(0, 'Filename', filenames)
 
