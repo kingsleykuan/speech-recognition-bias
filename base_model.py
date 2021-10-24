@@ -37,7 +37,7 @@ class BaseModel(nn.Module, ABC):
         torch.save(self.state_dict(), state_dict_path)
 
     @classmethod
-    def load(cls, model_path, **config_override):
+    def load(cls, model_path, map_location=None, **config_override):
         model_path = Path(model_path)
         config_path = model_path / 'config.json'
         state_dict_path = model_path / 'state_dict.pt'
@@ -47,5 +47,6 @@ class BaseModel(nn.Module, ABC):
         config.update(config_override)
 
         model = cls(**config)
-        model.load_state_dict(torch.load(state_dict_path))
+        model.load_state_dict(torch.load(
+            state_dict_path, map_location=map_location))
         return model

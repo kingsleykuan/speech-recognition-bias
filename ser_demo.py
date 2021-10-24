@@ -46,7 +46,7 @@ def arg_parser():
 
 
 def load_model(model_path):
-    model = CNNLSTM2DModel.load(model_path)
+    model = CNNLSTM2DModel.load(model_path, map_location=device)
     model = model.to(device)
     model = model.eval()
     return model

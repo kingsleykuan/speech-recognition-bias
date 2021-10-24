@@ -78,7 +78,7 @@ def load_data(
 
 
 def load_model(model_path):
-    model = CNNLSTM2DModel.load(model_path)
+    model = CNNLSTM2DModel.load(model_path, map_location=device)
     return model
 
 
