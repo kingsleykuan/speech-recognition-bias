@@ -7,5 +7,13 @@
     "empath": "eCZq7YPVGsLnjS5MQp-NNJBTugv90bWVm_ntBYu0XaA",
     "deepaffect": "QUV3GNwPB7EPk5TWJQUjospamvusFGK3"
   },
-  "Lib": "lib/lib_arm64.so"
+  "Lib": "lib/lib_linux64.so",
+  "model_path": [
+	  {"acted_cnn_lstm" : "models/acted/cnn_lstm/"},
+          {"acted_cnn_lstm_attention" : "models/acted/cnn_lstm_attention/"},
+          {"acted_cnn_lstm_attention_multitask" : "models/acted/cnn_lstm_attention_multitask/"},
+          {"observed_cnn_lstm" : "models/observed/cnn_lstm/"},
+          {"observed_cnn_lstm_attention" : "models/observed/cnn_lstm_attention/"},
+          {"observed_cnn_lstm_attention_multitask" : "models/observed/cnn_lstm_attention_multitask/"}
+  ]
 }

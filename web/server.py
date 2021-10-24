@@ -1,7 +1,9 @@
 from flask import Flask,send_from_directory, render_template,request
 import audio_handler as ah
 import commercial_api as ca
+import ser_api as ser
 import uuid
+import json
 
 app = Flask(__name__, template_folder='static')
 
@@ -16,8 +18,10 @@ def videos(path):
 @app.route('/ad', methods=['POST'])
 def ad():
     ogg = request.files['audio']
-    buffs = ogg.read()
-    return ca.emotion_detect(buffs, str(uuid.uuid4()), 'ogg')
+    result = {}
+    result["models"] = ser.predict_emotions(ogg)
+    return json.dumps(result)
+    # return ca.emotion_detect(buffs, str(uuid.uuid4()), 'ogg')
     
 
 if __name__ == '__main__':

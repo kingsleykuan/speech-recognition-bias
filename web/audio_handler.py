@@ -5,7 +5,13 @@ def empathWav(ogg):
     return convertOggToWav(ogg, '1', '11025')
 
 def vokaturiWav(ogg):
-    return convertOggToWav(ogg, '2', '44100')
+    return convertOggToWav(ogg, '2', '32000')
+
+def get_numpy_array_from_ogg(ogg):
+    sample = AudioSegment.from_raw(ogg, sample_width=2, frame_rate=44100, channels=2)
+    buf = io.BytesIO()
+    sample.export(buf, format='wav', parameters=['-ac', str(2), '-ar', str(44100)])
+    return AudioSegment.from_raw(buf, sample_width=2, frame_rate=44100, channels=2).get_array_of_samples()
 
 def convertOggToWav(ogg, ac, ar):
     audio = AudioSegment.from_file(ogg)

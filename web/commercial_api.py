@@ -35,7 +35,7 @@ def emotion_detect(audio, index, audio_format):
     if audio_format == 'ogg': 
         input_vokaturi = ah.vokaturiWav(io.BytesIO(audio))
         input_empath = ah.empathWav(io.BytesIO(audio))
-        input_deep_affect = ah.vokaturiWav(io.BytesIO(audio)).read()
+        input_deep_affect = ah.vokaturiWav(io.BytesIO(audio))
     elif audio_format == 'wav':
         input_vokaturi = copy.deepcopy(audio)
         input_empath = ah.downSampleWav(copy.deepcopy(audio))
@@ -78,6 +78,6 @@ def emotion_detect(audio, index, audio_format):
         result['deepaffect'] = 'No Result'
         print('An exception occurred: {}'.format(error))
 
-    return json.dumps(result)
+    return result
 
 
