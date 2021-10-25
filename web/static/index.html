@@ -1,19 +1,167 @@
 <!DOCTYPE html>
-<html >
+<html>
 
 <head>
     <link rel="stylesheet" href="./css/mini.css" />
     <script src="./js/jquery.js"></script>
     <script src="./js/index.js"></script>
+    <style>
+        .glow {
+            font-size: 80px;
+            color: #fff;
+            text-align: center;
+            -webkit-animation: glow 1s ease-in-out infinite alternate;
+            -moz-animation: glow 1s ease-in-out infinite alternate;
+            animation: glow 1s ease-in-out infinite alternate;
+        }
+
+        @-webkit-keyframes glow {
+            from {
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px bisque, 0 0 40px rgb(202, 190, 175), 0 0 50px rgb(189, 173, 154), 0 0 60px rgb(238, 200, 154), 0 0 70px bisque;
+            }
+
+            to {
+                text-shadow: 0 0 20px #fff, 0 0 30px bisque, 0 0 40px bisque, 0 0 50px bisque, 0 0 60px bisque, 0 0 70px bisque, 0 0 80px bisque;
+            }
+        }
+
+        #myTable {
+            border-collapse: collapse;
+            z-index: 99;
+            position: relative;
+            width: 80%;
+            margin: auto;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            font-size: 18px;
+            overflow: hidden;
+            display: table;
+            background-color: transparent;
+        }
+
+        #myTable th,
+        #myTable td {
+            text-align: left;
+            padding: 6px;
+            background-color: transparent;
+            color: whitesmoke;
+            /* Add padding */
+        }
+
+        #myTable tr {
+            /* Add a bottom border to all table rows */
+            border-bottom: 1px solid #061929;
+            text-align: center;
+        }
+
+        #myTable tr.header,
+        #myTable tr:hover {
+            /* Add a grey background color to the table header and on hover */
+            background-color: #042d4e;
+        }
+    </style>
 </head>
 
-<body style="width: 100%;height: 100%;position: relative;text-align: center;">
-    <div style="margin:0 auto">
-        <h1 value="time">0 s</h1>
-        <p value="result">this is the result</p>
-        <button class="primary" value="trigger" >Start</button>
+<body style="width: 100%;height: 100%;position: relative;text-align: center;background-image: url(img/bg.jpg); ">
+    <h1 style="color: bisque;"> IS5452/IS4152 Team 1 Demo &#128526;</h1>
+    <p style="color: bisque;" style="font-family: 'Times New Roman', Times, serif;">A Comparative Analysis of Gender and
+        Racial Bias in Speech
+        Emotion Recognition Between Different Measures of
+        Emotion</p>
+    <div style="margin: 0 auto; width: 80%; height: 100%; ">
+
+        <div
+            style="margin: 0 auto; width: 100%; padding-bottom: 20px; height: 100%; border-radius: 25px;border:10px; border-left-color: #000000;">
+            <div
+                style="margin: 0; width: 80%; height:80%;background-color: #061929; opacity: 0.8; position:absolute;border-radius: 25px;border:10px; border-left-color: #000000;">
+            </div>
+            <div
+                style="margin: 0; width: 80%; height:80%;background-color: #0b518a; opacity: 0.8; position:absolute;border-radius: 25px;border:10px; border-left-color: #000000;">
+            </div>
+            <div style="position: absolute;padding: 20px;"> <input label="ck" name="ck_commerical" type="checkbox"
+                    checked />
+                <label for="ck" style="color: navajowhite; font-size: 20px;">Commericial Models </label>
+            </div>
+            <div class="card" style="margin: 0 auto; background-color:transparent; border: 0; ">
+
+                <div style="margin:0 auto">
+                    <p value="time" style="font-size:30px;color: bisque;">Ready! &#128540;</p>
+                    <p> <a href="#" style="text-decoration: none;" value="trigger">
+                            <p class="glow" style="font-size:60px;">&#127897;</p>
+                        </a></p>
+                </div>
+                <audio id="audio" controls="controls" style="width: 100%;">
+                    <source id="audioSource" src="">
+                    </source>
+                </audio>
+            </div>
+            <!-- <p value="result">this is the result</p> -->
+            <table id="myTable" style="height: 100%;">
+                <tr class="header">
+                    <th style="width:20%;">Models</th>
+                    <th style="width:80%;">Prediction Results</th>
+                </tr>
+                <tr>
+                    <td>Acted CNN_LSTM</td>
+                    <td>
+                        <p value='acted_cnn_lstm' style="font-size: 20px;">&#128571;</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Acted CNN_LSTM_ATTENTION</td>
+                    <td>
+                        <p value='acted_cnn_lstm_attention' style="font-size: 20px;"> &#128571;</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Acted CNN_LSTM_ATTENTION_MULTITASK</td>
+                    <td>
+                        <p value='acted_cnn_lstm_attention_multitask' style="font-size: 20px;">&#128571; </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>OBSERVED CNN_LSTM</td>
+                    <td>
+                        <p value='observed_cnn_lstm' style="font-size: 20px;">&#128571;</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>OBSERVED CNN_LSTM_ATTENTION</td>
+                    <td>
+                        <p value='observed_cnn_lstm_attention' style="font-size: 20px;">&#128571; </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>OBSERVED CNN_LSTM_ATTENTION_MULTITASK</td>
+                    <td>
+                        <p value='observed_cnn_lstm_attention_multitask' style="font-size: 20px;">&#128571;</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><img src="img/empath.png" style="width: 30px;height:30px;">Empath</td>
+                    <td>
+                        <p value='empath' style="font-size: 20px;">Enabled</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><img src="img/vokaturi.png" style="width: 120px;height:40px;"></td>
+                    <td>
+                        <p value='vokaturi' style="font-size: 20px;"> Enabled</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><img src="img/deepaffects.png" style="width: 120px;height: 30px;"></td>
+                    <td>
+                        <p value='deepaffects' style="font-size: 20px;"> Enabled</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <span class="toast" hidden>This is a toast message!</span>
     </div>
-    <span class="toast" hidden>This is a toast message!</span>
+    <footer style="background-color: #0C2D48; margin-top: 10px; ">
+        <p style="color: cornsilk;"> Copyright 2021 &copy; By Team 1 IS5452/IS4152 NUS</p>
+    </footer>
 </body>
 
 </html>
