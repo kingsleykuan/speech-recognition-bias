@@ -57,7 +57,6 @@ def read_predictions(data_path):
     #path = Path('predictions')
     data_path = Path(data_path)
     paths = [path for path in data_path.glob('**/*') if path.is_file()]
-    path = "predictions\\acted\\cnn_lstm_attention_multitask.csv"
     reports = []
     for path in paths:
         if 'acted' in path.__str__():
