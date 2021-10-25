@@ -39,7 +39,7 @@ class SerModel:
     def __init__(self, name, path):
         self.name = name
         self.path = path
-        self.model = CNNLSTM2DModel.load(path)
+        self.model = CNNLSTM2DModel.load(path, map_location=device)
         self.model = self.model.to(device)
         self.model = self.model.eval()
     
@@ -105,12 +105,14 @@ for obj in path_list:
         model_list.append(sermodel)
 
 
-def predict_emotions(audio):
+def predict_emotions(audio, ar):
     result = {}
     # Convert audio to wav
-    audio = ah.get_numpy_array_from_ogg(audio)
+    audio = ah.get_numpy_array_from_ogg(io.BytesIO(audio), ar)
     audio = np.array(audio).astype(float)
-    print("---------------", type(audio))
     for model in model_list:
-        result[model.name] = model.predict_emotions(copy.deepcopy(audio), 44100)
+        try:
+            result[model.name] = model.predict_emotions(copy.deepcopy(audio), ar)
+        except:
+            pass
     return result

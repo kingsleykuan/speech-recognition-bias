@@ -3,6 +3,7 @@ import audio_handler as ah
 import commercial_api as ca
 import ser_api as ser
 import uuid
+import copy
 import json
 
 app = Flask(__name__, template_folder='static')
@@ -18,10 +19,20 @@ def videos(path):
 @app.route('/ad', methods=['POST'])
 def ad():
     ogg = request.files['audio']
+    br = request.form.get('br')
+    is_commercial_enabled = request.form.get('isCommercialEnabled')
+
+    print("bit rate: ", br)
+    ar = 44100
+    if br == 128000:
+        ar = 48000
+
+    ogg = ogg.read()
     result = {}
-    result["models"] = ser.predict_emotions(ogg)
+    result["models"] = ser.predict_emotions(copy.deepcopy(ogg), ar)
+    if is_commercial_enabled == 'true':
+        result["commercials"] = ca.emotion_detect(copy.deepcopy(ogg), str(uuid.uuid4()), 'ogg', ar)
     return json.dumps(result)
-    # return ca.emotion_detect(buffs, str(uuid.uuid4()), 'ogg')
     
 
 if __name__ == '__main__':

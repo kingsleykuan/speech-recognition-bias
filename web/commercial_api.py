@@ -25,7 +25,7 @@ print(Key)
 # params: audio        -- bytes : sample rate 44100hz and 2 channel
 #         index        -- the index coule be a random string or an integer
 #         audio_format -- 'ogg'/'wav' 
-def emotion_detect(audio, index, audio_format):
+def emotion_detect(audio, index, audio_format, ar):
 
     # We have to deep copy for each API, in the sense that they are should not be misused
     input_vokaturi = None
@@ -33,9 +33,9 @@ def emotion_detect(audio, index, audio_format):
     input_deep_affect = None
 
     if audio_format == 'ogg': 
-        input_vokaturi = ah.vokaturiWav(io.BytesIO(audio))
-        input_empath = ah.empathWav(io.BytesIO(audio))
-        input_deep_affect = ah.vokaturiWav(io.BytesIO(audio))
+        input_vokaturi = ah.ogg_to_2_44100_wav(io.BytesIO(audio), ar)
+        input_empath = ah.ogg_to_1_11025_wav(io.BytesIO(audio), ar)
+        input_deep_affect = ah.ogg_to_2_44100_wav(io.BytesIO(audio), ar)
     elif audio_format == 'wav':
         input_vokaturi = copy.deepcopy(audio)
         input_empath = ah.downSampleWav(copy.deepcopy(audio))
