@@ -54,25 +54,24 @@ def preprocess(emotion_type):
 
 
 def read_predictions(data_path):
-    #data_path = Path('predictions')
+    #path = Path('predictions')
     data_path = Path(data_path)
     paths = [path for path in data_path.glob('**/*') if path.is_file()]
-            
+    path = "predictions\\acted\\cnn_lstm_attention_multitask.csv"
     reports = []
     for path in paths:
         if 'acted' in path.__str__():
             str_ = 'intended_'
             pred = pd.read_csv(
                 path,
-                names=(
-                    'filename',
-                    'intended_ANG_pred',
-                    'intended_DIS_pred',
-                    'intended_FEA_pred',
-                    'intended_HAP_pred',
-                    'intended_NEU_pred',
-                    'intended_SAD_pred'),
-                header=0 
+                usecols=([
+                    'Filename',	
+                    'Anger',
+                    'Disgust',
+                    'Fear',
+                    'Happy',
+                    'Neutral',	
+                    'Sad'])
                 )
             ratings_demo = preprocess('intended')
             
@@ -80,17 +79,21 @@ def read_predictions(data_path):
             str_ = 'observed_'
             pred = pd.read_csv(
                 path,
-                names=(
-                    'filename',
-                    'observed_ANG_pred',
-                    'observed_DIS_pred',
-                    'observed_FEA_pred',
-                    'observed_HAP_pred',
-                    'observed_NEU_pred',
-                    'observed_SAD_pred'),
-                header=0 
+                usecols=([
+                    'Filename',	
+                    'Anger',
+                    'Disgust',
+                    'Fear',
+                    'Happy',
+                    'Neutral',	
+                    'Sad'])
                 )
             ratings_demo = preprocess('observed') 
+            
+        col_names = {k: "{}{}_pred".format(str_,k[:3].upper()) if k != 'Filename'
+                     else k.lower() for k in pred.columns}
+        pred.rename(columns = col_names, inplace = True)
+        
         for col in pred.drop(['filename'], axis = 1).columns:
             pred[col] = np.where(pred[col] > 0.5, 1, 0)
         
