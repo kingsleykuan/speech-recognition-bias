@@ -60,3 +60,33 @@ python -m ser_demo \
 --model_path 'models/acted/cnn_lstm_attention_multitask' \
 --audio_path 'Data/AudioWAV/1001_DFA_ANG_XX.wav'
 ```
+
+## Classify Emotions with Bootstrap Sampling
+```
+python -m classify_emotions \
+--data_path 'Data/MelSpecSplit/train' \
+--model_path 'models/intended/cnn_lstm' \
+--output_path 'predictions/intended/cnn_lstm.csv' \
+--bootstrap_sampling \
+--num_bootstrap_samples 100
+```
+
+```
+python -m classify_emotions \
+--data_path 'Data/MelSpecSplit/train' \
+--model_path 'models/intended/cnn_lstm_attention' \
+--output_path 'predictions/intended/cnn_lstm_attention.csv' \
+--bootstrap_sampling \
+--num_bootstrap_samples 100
+```
+
+```
+python -m classify_emotions \
+--data_path 'Data/MelSpecSplit/train' \
+--model_path 'models/intended/cnn_lstm_attention_multitask' \
+--output_path 'predictions/intended/cnn_lstm_attention_multitask.csv' \
+--predict_gender \
+--predict_race \
+--bootstrap_sampling \
+--num_bootstrap_samples 100
+```
