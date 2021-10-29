@@ -1,23 +1,28 @@
+from pathlib import Path
+
 import optuna
 import torch
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
+from cnn_lstm_model import CNNLSTM2DModel
 from crema_data import CremaAudioDataset
 from ser_trainer import SpeechEmotionRecognitionTrainer
-from cnn_lstm_model import CNNLSTM2DModel
 
+NUM_BOOTSTRAP_SAMPLES = 100
 CONFIG = {
     'data_path_train': 'Data/MelSpecSplit/train',
     'data_path_val': 'Data/MelSpecSplit/val',
     'demographics_csv_path': 'Data/VideoDemographics.csv',
     'ratings_csv_path': 'Data/processedResults/summaryTable.csv',
 
-    'save_path': 'models/cnn_lstm_attention',
-    'log_dir': 'runs/cnn_lstm_attention',
+    'save_path': 'models/cnn_lstm_attention_multitask',
+    'log_dir': 'runs/cnn_lstm_attention_multitask',
 
+    'bootstrap_sampling': False,
     'use_ratings': False,
-    'use_gender_label': False,
-    'use_race_label': False,
+    'use_gender_label': True,
+    'use_race_label': True,
 
     'num_epochs': 100,
     'steps_per_log': 50,
@@ -42,11 +47,19 @@ def load_data(
         data_path,
         demographics_csv_path,
         ratings_csv_path,
+        bootstrap_sampling=False,
+        out_of_bootstrap=False,
         batch_size=32,
         num_workers=4,
-        shuffle=True):
+        shuffle=True,
+        random_seed=0):
     dataset = CremaAudioDataset(
-        data_path, demographics_csv_path, ratings_csv_path)
+        data_path,
+        demographics_csv_path,
+        ratings_csv_path,
+        bootstrap_sampling=bootstrap_sampling,
+        out_of_bootstrap=out_of_bootstrap,
+        random_seed=random_seed)
     data_loader = DataLoader(
         dataset,
         batch_size=batch_size,
@@ -91,6 +104,7 @@ def train(
         ratings_csv_path,
         save_path,
         log_dir=None,
+        bootstrap_sampling=False,
         use_ratings=False,
         use_gender_label=False,
         use_race_label=False,
@@ -115,17 +129,23 @@ def train(
         data_path_train,
         demographics_csv_path,
         ratings_csv_path,
+        bootstrap_sampling=bootstrap_sampling,
+        out_of_bootstrap=False,
         batch_size=batch_size,
         num_workers=num_workers,
-        shuffle=True)
+        shuffle=True,
+        random_seed=random_seed)
 
     data_loader_eval = load_data(
         data_path_val,
         demographics_csv_path,
         ratings_csv_path,
+        bootstrap_sampling=False,
+        out_of_bootstrap=False,
         batch_size=batch_size,
         num_workers=num_workers,
-        shuffle=False)
+        shuffle=False,
+        random_seed=random_seed)
 
     model = load_model(
         lstm_hidden_size=lstm_hidden_size,
@@ -188,6 +208,18 @@ def tune_hyperparameters(**config):
     print(study.best_value)
 
 
+def train_bootstrap(num_bootstrap_samples, **config):
+    save_path = Path(config['save_path'])
+
+    for i in tqdm(range(num_bootstrap_samples)):
+        config['bootstrap_sampling'] = True
+        config['save_path'] = save_path.parent / (save_path.name + f'_{i}')
+        config['random_seed'] = i
+
+        train(**config)
+
+
 if __name__ == '__main__':
     # tune_hyperparameters(**CONFIG)
-    train(**CONFIG)
+    # train(**CONFIG)
+    train_bootstrap(NUM_BOOTSTRAP_SAMPLES, **CONFIG)

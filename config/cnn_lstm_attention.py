@@ -7,6 +7,7 @@ CONFIG = {
     'save_path': 'models/cnn_lstm_attention',
     'log_dir': 'runs/cnn_lstm_attention',
 
+    'bootstrap_sampling': False,
     'use_ratings': False,
     'use_gender_label': False,
     'use_race_label': False,
