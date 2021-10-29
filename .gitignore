@@ -3,12 +3,14 @@ Data/
 
 # Model files
 models/
+models_bootstrap/
 
 # Tensorboard files
 runs/
 
 # Prediction files
 predictions/
+predictions_bootstrap/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

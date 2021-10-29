@@ -35,7 +35,7 @@ def arg_parser():
         description="Classify emotions using speech emotion recognition.")
 
     parser.add_argument(
-        '--model_path', default='models/acted/cnn_lstm', type=str,
+        '--model_path', default='models/intended/cnn_lstm', type=str,
         help='Path to saved model.')
 
     parser.add_argument(

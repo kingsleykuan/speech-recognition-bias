@@ -7,6 +7,7 @@ CONFIG = {
     'save_path': 'models/simple',
     'log_dir': 'runs/simple',
 
+    'bootstrap_sampling': False,
     'use_ratings': False,
     'num_epochs': 100,
     'steps_per_log': 50,

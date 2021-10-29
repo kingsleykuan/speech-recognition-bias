@@ -1,6 +1,7 @@
 import pickle
 
 import numpy as np
+from sklearn.utils import resample
 from torch.utils.data import Dataset
 
 from crema_metadata import read_actor_demographics, read_metadata, read_ratings
@@ -28,7 +29,14 @@ RACES = {
 
 
 class CremaAudioDataset(Dataset):
-    def __init__(self, data_path, demographics_csv_path, ratings_csv_path):
+    def __init__(
+            self,
+            data_path,
+            demographics_csv_path,
+            ratings_csv_path,
+            bootstrap_sampling=False,
+            out_of_bootstrap=False,
+            random_seed=0):
         metadata = read_metadata(data_path)
         actor_demographics = read_actor_demographics(demographics_csv_path)
         ratings = read_ratings(ratings_csv_path)
@@ -43,6 +51,21 @@ class CremaAudioDataset(Dataset):
             how='inner',
             on='filename',
             validate='one_to_one')
+
+        metadata.sort_values('filename', inplace=True, kind='mergesort')
+
+        if bootstrap_sampling:
+            bootstrap_metadata = resample(
+                metadata,
+                replace=True,
+                n_samples=len(metadata),
+                random_state=random_seed)
+
+            if out_of_bootstrap:
+                metadata = metadata[
+                    ~metadata['filename'].isin(bootstrap_metadata['filename'])]
+            else:
+                metadata = bootstrap_metadata
 
         data = []
         for path in metadata['path']:
