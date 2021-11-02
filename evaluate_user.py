@@ -5,6 +5,7 @@ from evaluate import get_test_set_filenames, preprocess_crema, macro_avg_f1_scor
 from pathlib import Path
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 #Calculate F1-scores and return DataFrame
 def get_f1_scores(bootstrap_path):
@@ -18,8 +19,9 @@ def get_f1_scores(bootstrap_path):
     
     data_path = Path(bootstrap_path)
     paths = [path for path in data_path.glob('**/*') if path.is_file()]
+    paths.sort()
     
-    for path in paths:
+    for path in tqdm(paths):
         model_intended_observed = path.parts[-3]
         model = path.parts[-2]
         bootstrap = path.parts[-1].split(".")[0].split("_")[-1]
@@ -95,5 +97,11 @@ def get_f1_scores(bootstrap_path):
 
 if __name__ == '__main__':    
     df = get_f1_scores('predictions_bootstrap')
-    #df.to_csv('f1_results.csv', index = False)
-    get_confidence_interval(df, 0.95).to_csv('f1_score_results/user/user_models.csv', index = False) 
+
+    output_path = Path('f1_score_results/user/f1_results.csv')
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(output_path, index = False)
+
+    output_path = Path('f1_score_results/user/user_models.csv')
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    get_confidence_interval(df, 0.95).to_csv(output_path, index = False) 
