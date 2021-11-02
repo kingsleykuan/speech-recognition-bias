@@ -3,6 +3,7 @@ Preprocess Commercial .json results
 """
 from pathlib import Path
 import json
+import numpy as np
 import pandas as pd
 
 def preprocess_vokaturi(path):
@@ -23,10 +24,10 @@ def preprocess_vokaturi(path):
         
         index.append(ind)
         if 'msg' in preds.keys():
-            anger.append('null')
-            happy.append('null')
-            neutral.append('null')
-            sad.append('null')
+            anger.append(np.NaN)
+            happy.append(np.NaN)
+            neutral.append(np.NaN)
+            sad.append(np.NaN)
         else:
             anger.append(preds['Angry'])
             happy.append(preds['Happy'])
@@ -34,7 +35,7 @@ def preprocess_vokaturi(path):
             sad.append(preds['Sad'])
     
     df = pd.DataFrame(data=zip(index,anger,happy,neutral,sad), \
-                      columns=['Filename','Anger','Happy', 'Neutral', 'Sad'])
+                      columns=['Filename','Anger','Happy', 'Neutral', 'Sad']).dropna()
     return df     
 
 def preprocess_empath(path):
@@ -126,8 +127,8 @@ def preprocess_da(path):
 
 
 if __name__ == '__main__': 
-    preprocess_da("predictions/commercial_results/results").to_csv('predictions/commercial_results/deepaffect.csv', index = False)
-    preprocess_empath("predictions/commercial_results/results").to_csv('predictions/commercial_results/empath.csv', index = False)
-    preprocess_vokaturi('predictions/commercial_results/results').to_csv('predictions/commercial_results/vokaturi.csv', index = False)
+    preprocess_da("predictions/commercial_results/results").to_csv('predictions/commercial_results/results_csv/deepaffect.csv', index = False)
+    preprocess_empath("predictions/commercial_results/results").to_csv('predictions/commercial_results/results_csv/empath.csv', index = False)
+    preprocess_vokaturi('predictions/commercial_results/results').to_csv('predictions/commercial_results/results_csv/vokaturi.csv', index = False)
 
 

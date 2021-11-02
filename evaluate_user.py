@@ -43,7 +43,7 @@ def get_f1_scores(bootstrap_path):
         
         #Convert probabilities to 0s and 1s
         for col in pred_df.drop(['filename'], axis = 1).columns:
-            pred_df[col] = np.where(pred_df[col] > 0.5, 1, 0)
+            pred_df[col] = np.where(pred_df[col] >= 0.5, 1, 0)
         
         test_file_name = get_test_set_filenames(path)
         crema = preprocess_crema(demographics_path = 'Data/VideoDemographics.csv',
@@ -60,7 +60,6 @@ def get_f1_scores(bootstrap_path):
                 target_intended_observed = 'intended'
                             
             cat_pred_df = cat.merge(pred_df, on = 'filename')
-            cat_pred_df.columns
             
             if model_intended_observed == target_intended_observed:
                 y_true = cat_pred_df[cat_pred_df.filter(regex="{}_".format(target_intended_observed))
@@ -94,8 +93,7 @@ def get_f1_scores(bootstrap_path):
                                       'f1_score'])
     return f1_df
 
-
 if __name__ == '__main__':    
     df = get_f1_scores('predictions_bootstrap')
     #df.to_csv('f1_results.csv', index = False)
-    get_confidence_interval(df, 0.95).to_csv('user_models_ci.csv', index = False) 
+    get_confidence_interval(df, 0.95).to_csv('f1_score_results/user/user_models.csv', index = False) 
