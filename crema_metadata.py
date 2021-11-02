@@ -3,6 +3,26 @@ from pathlib import Path
 import pandas as pd
 
 
+def parse_metadata(filenames):
+    metadata = [filename.split('_') for filename in filenames]
+
+    metadata = [
+        [filename] + attributes
+        for filename, attributes in zip(filenames, metadata)]
+    metadata = pd.DataFrame(
+        metadata,
+        columns=(
+            'filename',
+            'actor_id',
+            'sentence',
+            'emotion',
+            'emotion_level',
+        ))
+    metadata['actor_id'] = pd.to_numeric(metadata['actor_id'])
+
+    return metadata
+
+
 def read_metadata(data_path):
     data_path = Path(data_path)
     paths = [path for path in data_path.glob('**/*') if path.is_file()]

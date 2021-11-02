@@ -1,7 +1,7 @@
 from sklearn.metrics import classification_report
 import numpy as np
 import pandas as pd
-from crema_metadata import read_actor_demographics, read_ratings
+from crema_metadata import read_actor_demographics, parse_metadata, read_ratings
 import scipy.stats as st
 
 #Get the filenames of the test set.
@@ -11,36 +11,28 @@ def get_test_set_filenames(path):
 
 #Preprocess VideoDemographics.csv and summaryTable.csv
 def preprocess_crema(ratings_path, demographics_path, test_file_names):
+    metadata = parse_metadata(test_file_names)
     demo = read_actor_demographics(demographics_path)
     ratings = read_ratings(ratings_path)
     
     #Generate observed and intended columns, and apply OHE
-    ratings['observed'] = ratings['voice_vote'] 
-    
+    metadata = metadata.filter(items=['filename', 'actor_id', 'emotion'])
+    metadata = pd.get_dummies(metadata, prefix='intended', prefix_sep='_', columns=['emotion'])
+
     ratings['observed_ANG'] = np.where(ratings['voice_vote'].str.contains("A"), 1, 0)
     ratings['observed_DIS'] = np.where(ratings['voice_vote'].str.contains("D"), 1, 0)
     ratings['observed_FEA'] = np.where(ratings['voice_vote'].str.contains("F"), 1, 0)
     ratings['observed_HAP'] = np.where(ratings['voice_vote'].str.contains("H"), 1, 0)
     ratings['observed_NEU'] = np.where(ratings['voice_vote'].str.contains("N"), 1, 0)
     ratings['observed_SAD'] = np.where(ratings['voice_vote'].str.contains("S"), 1, 0)
-    
-    ratings = ratings[ratings.filter(regex='filename|observed_').columns]
-    
-    ratings.loc[:, 'intended'] = np.vectorize(lambda x : x.split('_')[2])(ratings.loc[:,'filename'])
-    ratings.loc[:, 'actor_id'] = np.vectorize(lambda x : int(x.split('_')[0]))(ratings.loc[:,'filename'])
-    
-    #Merge dataframes
-    ratings_demo = pd.concat([
-        ratings.merge(demo, on = 'actor_id'),
-        pd.get_dummies(ratings['intended'], prefix = "intended_", prefix_sep = '')],
-        axis = 1).drop(columns = ['intended'])
-    
-    #Filter according to test_file_names
-    ratings_demo = ratings_demo[ratings_demo['filename'].isin(test_file_names)]
-    
-    observed_ratings_demo = ratings_demo.drop(list(ratings_demo.filter(regex = 'intended')), axis = 1)
-    intended_ratings_demo = ratings_demo.drop(list(ratings_demo.filter(regex = 'observed')), axis = 1)
-    
+    ratings = ratings.filter(regex='filename|observed_')
+
+    ratings = pd.merge(metadata, ratings, how='inner', on='filename')
+    ratings_demo = pd.merge(ratings, demo, how='inner', on='actor_id')
+
+    observed_ratings_demo = ratings_demo.filter(regex='filename|observed_|sex|race')
+    intended_ratings_demo = ratings_demo.filter(regex='filename|intended_|sex|race')
+
     #Return dictionary of observed and intended labels for the 4 categories we are comparing
     d = {'observed_male' : observed_ratings_demo.loc[observed_ratings_demo['sex'] == 'Male'],
          'observed_female' : observed_ratings_demo.loc[observed_ratings_demo['sex'] == 'Female'],

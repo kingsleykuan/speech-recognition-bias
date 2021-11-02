@@ -6,6 +6,7 @@ from evaluate import get_test_set_filenames, preprocess_crema, macro_avg_f1_scor
 from pathlib import Path
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 """
 test = 'predictions/commercial_results/results_csv'
@@ -29,9 +30,10 @@ def get_f1_scores(pred_path):
     
     data_path = Path(pred_path)
     paths = [path for path in data_path.glob('**/*') if path.is_file()]
+    paths.sort()
 
-    for path in paths:
-        model = path.__str__().split("\\")[-1][:-4]
+    for path in tqdm(paths):
+        model = path.stem
         emotions = [
             'Filename',	
             'Anger',
@@ -93,6 +95,10 @@ def get_f1_scores(pred_path):
     return f1_df
 
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     df = get_f1_scores("predictions/commercial_results/results_csv")
-    df.to_csv('f1_score_results/commercial/commercial_models.csv', index = False)
+
+    output_path = Path('f1_score_results/commercial/commercial_models.csv')
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    df.to_csv(output_path, index = False)

@@ -5,6 +5,7 @@ from evaluate import get_test_set_filenames, preprocess_crema, macro_avg_f1_scor
 from pathlib import Path
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 #Calculate F1-scores and return DataFrame
 def get_f1_scores(bootstrap_path):
@@ -18,11 +19,12 @@ def get_f1_scores(bootstrap_path):
     
     data_path = Path(bootstrap_path)
     paths = [path for path in data_path.glob('**/*') if path.is_file()]
+    paths.sort()
     
-    for path in paths:
-        model_intended_observed = path.__str__().split("\\")[2]
-        model = path.__str__().split("\\")[3]
-        bootstrap = path.__str__().split("\\")[4].split(".")[0].split("_")[-1]
+    for path in tqdm(paths):
+        model_intended_observed = path.parts[-3]
+        model = path.parts[-2]
+        bootstrap = path.parts[-1].split(".")[0].split("_")[-1]
         emotions = [
             'Filename',	
             'Anger',
@@ -51,26 +53,17 @@ def get_f1_scores(bootstrap_path):
             test_file_names= test_file_name)
 
         for key, cat in crema.items():
-            
+            target_intended_observed = key.split("_")[0]
             subset = key.split("_")[-1]
-            
-            if 'observed' in key:
-                target_intended_observed = 'observed'
-            else:
-                target_intended_observed = 'intended'
-                            
+
             cat_pred_df = cat.merge(pred_df, on = 'filename')
-            
-            if model_intended_observed == target_intended_observed:
-                y_true = cat_pred_df[cat_pred_df.filter(regex="{}_".format(target_intended_observed))
-                                 .columns] \
-                    .drop(list(cat_pred_df.filter(regex = 'pred')), axis = 1).to_numpy()
-            else:
-                y_true = cat_pred_df[cat_pred_df.filter(regex="{}_".format(target_intended_observed))
-                                 .columns].to_numpy()
-                    
-            y_pred = cat_pred_df[cat_pred_df.filter(regex='pred').columns].to_numpy()
-            
+
+            y_true = cat_pred_df \
+                .drop(columns=cat_pred_df.filter(regex='.+pred').columns) \
+                .filter(regex='{}_'.format(target_intended_observed)) \
+                .to_numpy()
+            y_pred = cat_pred_df.filter(regex='.+pred').to_numpy()
+
             target_intended_observed_ls.append(target_intended_observed)    
             model_intended_observed_ls.append(model_intended_observed)
             model_ls.append(model)
@@ -95,5 +88,11 @@ def get_f1_scores(bootstrap_path):
 
 if __name__ == '__main__':    
     df = get_f1_scores('predictions_bootstrap')
-    #df.to_csv('f1_results.csv', index = False)
-    get_confidence_interval(df, 0.95).to_csv('f1_score_results/user/user_models.csv', index = False) 
+
+    output_path = Path('f1_score_results/user/f1_results.csv')
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(output_path, index = False)
+
+    output_path = Path('f1_score_results/user/user_models.csv')
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    get_confidence_interval(df, 0.95).to_csv(output_path, index = False) 
