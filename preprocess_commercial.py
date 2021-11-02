@@ -54,10 +54,10 @@ def preprocess_empath(path):
         print(preds)
         
         index.append(ind)
-        anger.append(preds['anger'])
-        happy.append(preds['joy'])
-        neutral.append(preds['calm'])
-        sad.append(preds['sorrow'])
+        anger.append(preds['anger'] /50)
+        happy.append(preds['joy'] /50)
+        neutral.append(preds['calm'] /50)
+        sad.append(preds['sorrow'] /50)
     
     df = pd.DataFrame(data=zip(index,anger,happy,neutral,sad), \
                       columns=['Filename','Anger','Happy', 'Neutral', 'Sad'])
