@@ -126,9 +126,10 @@ def preprocess_da(path):
     return df
 
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
+    output_dir = Path('predictions/commercial_results/results_csv')
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     preprocess_da("predictions/commercial_results/results").to_csv('predictions/commercial_results/results_csv/deepaffect.csv', index = False)
     preprocess_empath("predictions/commercial_results/results").to_csv('predictions/commercial_results/results_csv/empath.csv', index = False)
     preprocess_vokaturi('predictions/commercial_results/results').to_csv('predictions/commercial_results/results_csv/vokaturi.csv', index = False)
-
-
