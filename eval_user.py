@@ -6,6 +6,7 @@ from pathlib import Path
 from sklearn.metrics import classification_report
 import numpy as np
 import pandas as pd
+import scipy.stats as st
 from crema_metadata import read_actor_demographics, read_ratings
 
 #Get the filenames of the test set.
@@ -150,7 +151,63 @@ def get_f1_scores(bootstrap_path):
                                       'f1_score'])
     return f1_df
 
-df = get_f1_scores('predictions_bootstrap')
+def get_confidence_interval(df, alpha):
+    target_intended_observed = []
+    model_intended_observed = []
+    model = []
+    subset = []
+    f1_score_mean = []
+    f1_score_std = []
+    f1_score_ci = []
+    
+    #Subset Df
+    target_intended_observed_unique = ['intended', 'observed']
+    model_intended_observed_unique = ['intended', 'observed']
+    model_unique = ['cnn_lstm', 'cnn_lstm_attention', 'cnn_lstm_attention_multitask']
+    subset_unique = ['male', 'female', 'cauc', 'non-cauc']
+    
+    for i in target_intended_observed_unique:   
+        for j in model_intended_observed_unique:
+            for k in model_unique:
+                for l in subset_unique:
+                    f1_scores = df.loc[(df['target_intended_observed'] == i) &
+                                 (df['model_intended_observed'] == j) &
+                                 (df['model'] == k) &
+                                 (df['subset'] == l)]['f1_score'].to_numpy()
+                    
+                    mean_ = np.mean(f1_scores)
+                    std_ = np.std(f1_scores)                  
+                    ci_ = st.t.interval(alpha=alpha, 
+                                  df=len(f1_scores)-1, 
+                                  loc=np.mean(f1_scores), 
+                                  scale=st.sem(f1_scores))
+                    
+                    target_intended_observed.append(i)
+                    model_intended_observed.append(j)
+                    model.append(k)
+                    subset.append(l)
+                    f1_score_mean.append(mean_)
+                    f1_score_std.append(std_)
+                    f1_score_ci.append(ci_)
+                    
+    ci_df = pd.DataFrame(data=zip(target_intended_observed,
+                                      model_intended_observed,
+                                      model,
+                                      subset,
+                                      f1_score_mean,
+                                      f1_score_std,
+                                      f1_score_ci), 
+                             columns=['target_intended_observed',
+                                      'model_intended_observed',
+                                      'model', 
+                                      'subset',
+                                      'f1_score_mean',
+                                      'f1_score_std',
+                                      'f1_score_ci'])
+    return ci_df
 
-df.to_csv('f1_results.csv', index = False)
 
+if __name__ == '__main__':    
+    df = get_f1_scores('predictions_bootstrap')
+    #df.to_csv('f1_results.csv', index = False)
+    get_confidence_interval(df, 0.95).to_csv('ci.csv', index = False) 
