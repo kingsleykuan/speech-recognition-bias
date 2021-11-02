@@ -1,8 +1,8 @@
 from sklearn.metrics import classification_report
 import numpy as np
 import pandas as pd
-import scipy.stats as st
 from crema_metadata import read_actor_demographics, read_ratings
+import scipy.stats as st
 
 #Get the filenames of the test set.
 def get_test_set_filenames(path):
@@ -53,11 +53,6 @@ def preprocess_crema(ratings_path, demographics_path, test_file_names):
         }
     
     return d
-
-#Macro Avg F1-score computation
-def macro_avg_f1_score(y_true, y_pred):
-    return classification_report(y_true, y_pred, output_dict = True, zero_division = 0)['macro avg']['f1-score']
-
 
 def get_confidence_interval(df, alpha):
     target_intended_observed = []
@@ -113,3 +108,9 @@ def get_confidence_interval(df, alpha):
                                       'f1_score_std',
                                       'f1_score_ci'])
     return ci_df
+
+
+#Macro Avg F1-score computation
+def macro_avg_f1_score(y_true, y_pred):
+    return classification_report(y_true, y_pred, output_dict = True, zero_division = 0)['macro avg']['f1-score']
+
