@@ -20,9 +20,9 @@ def get_f1_scores(bootstrap_path):
     paths = [path for path in data_path.glob('**/*') if path.is_file()]
     
     for path in paths:
-        model_intended_observed = path.__str__().split("\\")[2]
-        model = path.__str__().split("\\")[3]
-        bootstrap = path.__str__().split("\\")[4].split(".")[0].split("_")[-1]
+        model_intended_observed = path.parts[-3]
+        model = path.parts[-2]
+        bootstrap = path.parts[-1].split(".")[0].split("_")[-1]
         emotions = [
             'Filename',	
             'Anger',
