@@ -53,26 +53,17 @@ def get_f1_scores(bootstrap_path):
             test_file_names= test_file_name)
 
         for key, cat in crema.items():
-            
+            target_intended_observed = key.split("_")[0]
             subset = key.split("_")[-1]
-            
-            if 'observed' in key:
-                target_intended_observed = 'observed'
-            else:
-                target_intended_observed = 'intended'
-                            
+
             cat_pred_df = cat.merge(pred_df, on = 'filename')
-            
-            if model_intended_observed == target_intended_observed:
-                y_true = cat_pred_df[cat_pred_df.filter(regex="{}_".format(target_intended_observed))
-                                 .columns] \
-                    .drop(list(cat_pred_df.filter(regex = 'pred')), axis = 1).to_numpy()
-            else:
-                y_true = cat_pred_df[cat_pred_df.filter(regex="{}_".format(target_intended_observed))
-                                 .columns].to_numpy()
-                    
-            y_pred = cat_pred_df[cat_pred_df.filter(regex='pred').columns].to_numpy()
-            
+
+            y_true = cat_pred_df \
+                .drop(columns=cat_pred_df.filter(regex='.+pred').columns) \
+                .filter(regex='{}_'.format(target_intended_observed)) \
+                .to_numpy()
+            y_pred = cat_pred_df.filter(regex='.+pred').to_numpy()
+
             target_intended_observed_ls.append(target_intended_observed)    
             model_intended_observed_ls.append(model_intended_observed)
             model_ls.append(model)
