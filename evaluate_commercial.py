@@ -2,31 +2,21 @@
 Compare commercial models with mean, std, CI over the original test set split.
 """
 
-from evaluate import get_test_set_filenames, preprocess_crema, macro_avg_f1_score
+from evaluate import get_test_set_filenames, preprocess_crema, macro_avg_score
 from pathlib import Path
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-"""
-test = 'predictions/commercial_results/results_csv'
-
-get_test_set_filenames(test)
-[WindowsPath('predictions/commercial_results/results_csv/deepaffect.csv'),
- WindowsPath('predictions/commercial_results/results_csv/empath.csv'),
- WindowsPath('predictions/commercial_results/results_csv/vokaturi.csv')]
-
-data_path = Path("predictions/commercial_results/results_csv")
-paths = [path for path in data_path.glob('**/*') if path.is_file()]
-"""
-
-def get_f1_scores(pred_path):
+def get_metrics(pred_path):
     #bootstrap_path = 'predictions_bootstrap'
     #pred_path = "predictions/commercial_results/results_csv"
     target_intended_observed_ls = []
     model_ls = []
     subset_ls = []
     f1_score = []
+    precision = []
+    recall = []
     
     data_path = Path(pred_path)
     paths = [path for path in data_path.glob('**/*') if path.is_file()]
@@ -81,24 +71,30 @@ def get_f1_scores(pred_path):
             target_intended_observed_ls.append(target_intended_observed)    
             model_ls.append(model)
             subset_ls.append(subset)
-            f1_score.append(macro_avg_f1_score(y_true, y_pred))
+            f1_score.append(macro_avg_score(y_true, y_pred)['f1-score'])
+            precision.append(macro_avg_score(y_true, y_pred)['precision'])
+            recall.append(macro_avg_score(y_true, y_pred)['recall'])
         
         
     f1_df = pd.DataFrame(data=zip(target_intended_observed_ls,
                                       model_ls,
                                       subset_ls,
-                                      f1_score), 
+                                      f1_score,
+                                      precision,
+                                      recall), 
                              columns=['target_intended_observed',
                                       'model', 
                                       'subset',
-                                      'f1_score'])
+                                      'f1_score',
+                                      'precision',
+                                      'recall'])
     return f1_df
 
 
 if __name__ == '__main__':
-    df = get_f1_scores("predictions/commercial_results/results_csv")
+    df = get_metrics("predictions/commercial_results/results_csv")
 
-    output_path = Path('f1_score_results/commercial/commercial_models.csv')
+    output_path = Path('bias_results/commercial/commercial_models.csv')
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     df.to_csv(output_path, index = False)

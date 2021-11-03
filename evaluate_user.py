@@ -1,14 +1,14 @@
 """
 Compare Our models with mean, std, CI over the 100 bootstrapped sets
 """
-from evaluate import get_test_set_filenames, preprocess_crema, macro_avg_f1_score, get_confidence_interval
+from evaluate import get_test_set_filenames, preprocess_crema, macro_avg_score, get_confidence_interval
 from pathlib import Path
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-#Calculate F1-scores and return DataFrame
-def get_f1_scores(bootstrap_path):
+#Calculate F1-Score, Precision & Recall and return DataFrame
+def get_metrics(bootstrap_path):
     #bootstrap_path = 'predictions_bootstrap'
     target_intended_observed_ls = []
     model_intended_observed_ls = []
@@ -16,6 +16,8 @@ def get_f1_scores(bootstrap_path):
     bootstrap_ls = []
     subset_ls = []
     f1_score = []
+    precision = []
+    recall = []
     
     data_path = Path(bootstrap_path)
     paths = [path for path in data_path.glob('**/*') if path.is_file()]
@@ -24,7 +26,7 @@ def get_f1_scores(bootstrap_path):
     for path in tqdm(paths):
         model_intended_observed = path.parts[-3]
         model = path.parts[-2]
-        bootstrap = path.parts[-1].split(".")[0].split("_")[-1]
+        bootstrap = int(path.parts[-1].split(".")[0].split("_")[-1])
         emotions = [
             'Filename',	
             'Anger',
@@ -69,7 +71,9 @@ def get_f1_scores(bootstrap_path):
             model_ls.append(model)
             subset_ls.append(subset)
             bootstrap_ls.append(bootstrap)
-            f1_score.append(macro_avg_f1_score(y_true, y_pred))
+            f1_score.append(macro_avg_score(y_true, y_pred)['f1-score'])
+            precision.append(macro_avg_score(y_true, y_pred)['precision'])
+            recall.append(macro_avg_score(y_true, y_pred)['recall'])
         
         
     f1_df = pd.DataFrame(data=zip(target_intended_observed_ls,
@@ -77,22 +81,26 @@ def get_f1_scores(bootstrap_path):
                                       model_ls,
                                       bootstrap_ls,
                                       subset_ls,
-                                      f1_score), 
+                                      f1_score,
+                                      precision,
+                                      recall), 
                              columns=['target_intended_observed',
                                       'model_intended_observed',
                                       'model', 
                                       'bootstrap', 
                                       'subset',
-                                      'f1_score'])
+                                      'f1_score',
+                                      'precision',
+                                      'recall'])
     return f1_df
 
 if __name__ == '__main__':    
-    df = get_f1_scores('predictions_bootstrap')
+    df = get_metrics('predictions_bootstrap')
 
-    output_path = Path('f1_score_results/user/f1_results.csv')
+    output_path = Path('bias_results/user/user_models_all.csv')
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(output_path, index = False)
 
-    output_path = Path('f1_score_results/user/user_models.csv')
+    output_path = Path('bias_results/user/user_models.csv')
     output_path.parent.mkdir(parents=True, exist_ok=True)
     get_confidence_interval(df, 0.95).to_csv(output_path, index = False) 
