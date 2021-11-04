@@ -2,7 +2,7 @@
 Compare commercial models with mean, std, CI over the original test set split.
 """
 
-from evaluate import get_test_set_filenames, preprocess_crema, macro_avg_score
+from evaluate import get_test_set_filenames, preprocess_crema, scores
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -15,7 +15,6 @@ def get_metrics(pred_path):
     model_ls = []
     subset_ls = []
     f1_score = []
-    precision = []
     recall = []
     
     data_path = Path(pred_path)
@@ -71,22 +70,21 @@ def get_metrics(pred_path):
             target_intended_observed_ls.append(target_intended_observed)    
             model_ls.append(model)
             subset_ls.append(subset)
-            f1_score.append(macro_avg_score(y_true, y_pred)['f1-score'])
-            precision.append(macro_avg_score(y_true, y_pred)['precision'])
-            recall.append(macro_avg_score(y_true, y_pred)['recall'])
-        
-        
+
+            scores_dict = scores(y_true, y_pred)
+            f1_score.append(scores_dict['f1-score'])
+            recall.append(scores_dict['recall'])
+
+
     f1_df = pd.DataFrame(data=zip(target_intended_observed_ls,
                                       model_ls,
                                       subset_ls,
                                       f1_score,
-                                      precision,
                                       recall), 
                              columns=['target_intended_observed',
                                       'model', 
                                       'subset',
                                       'f1_score',
-                                      'precision',
                                       'recall'])
     return f1_df
 

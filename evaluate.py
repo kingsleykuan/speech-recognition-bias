@@ -54,9 +54,6 @@ def get_confidence_interval(df, alpha):
     f1_score_mean = []
     f1_score_std = []
     f1_score_ci = []
-    precision_mean = []
-    precision_std = []
-    precision_ci = []
     recall_mean = []
     recall_std = []
     recall_ci = []
@@ -75,10 +72,6 @@ def get_confidence_interval(df, alpha):
                                  (df['model_intended_observed'] == j) &
                                  (df['model'] == k) &
                                  (df['subset'] == l)]['f1_score'].to_numpy()
-                    precisions = df.loc[(df['target_intended_observed'] == i) &
-                                 (df['model_intended_observed'] == j) &
-                                 (df['model'] == k) &
-                                 (df['subset'] == l)]['precision'].to_numpy()
                     recalls = df.loc[(df['target_intended_observed'] == i) &
                                  (df['model_intended_observed'] == j) &
                                  (df['model'] == k) &
@@ -90,13 +83,6 @@ def get_confidence_interval(df, alpha):
                                   df=len(f1_scores)-1, 
                                   loc=np.mean(f1_scores), 
                                   scale=st.sem(f1_scores))
-                    
-                    precision_mean_ = np.mean(precisions)
-                    precision_std_ = np.std(precisions)                  
-                    precision_ci_ = st.t.interval(alpha=alpha, 
-                                  df=len(precisions)-1, 
-                                  loc=np.mean(precisions), 
-                                  scale=st.sem(precisions))
                     
                     recall_mean_ = np.mean(recalls)
                     recall_std_ = np.std(recalls)                  
@@ -112,9 +98,6 @@ def get_confidence_interval(df, alpha):
                     f1_score_mean.append(f1_score_mean_)
                     f1_score_std.append(f1_score_std_)
                     f1_score_ci.append(f1_score_ci_)
-                    precision_mean.append(precision_mean_)
-                    precision_std.append(precision_std_)
-                    precision_ci.append(precision_ci_)
                     recall_mean.append(recall_mean_)
                     recall_std.append(recall_std_)
                     recall_ci.append(recall_ci_)
@@ -126,9 +109,6 @@ def get_confidence_interval(df, alpha):
                                       f1_score_mean,
                                       f1_score_std,
                                       f1_score_ci,
-                                      precision_mean,
-                                      precision_std,
-                                      precision_ci,
                                       recall_mean,
                                       recall_std,
                                       recall_ci), 
@@ -139,15 +119,11 @@ def get_confidence_interval(df, alpha):
                                       'f1_score_mean',
                                       'f1_score_std',
                                       'f1_score_ci',
-                                      'precision_mean',
-                                      'precision_std',
-                                      'precision_ci',
                                       'recall_mean',
                                       'recall_std',
                                       'recall_ci'])
     return ci_df
 
 
-#Macro Avg F1-score computation
-def macro_avg_score(y_true, y_pred):
+def scores(y_true, y_pred):
     return classification_report(y_true, y_pred, output_dict = True, zero_division = 0)['macro avg']

@@ -1,13 +1,13 @@
 """
 Compare Our models with mean, std, CI over the 100 bootstrapped sets
 """
-from evaluate import get_test_set_filenames, preprocess_crema, macro_avg_score, get_confidence_interval
+from evaluate import get_test_set_filenames, preprocess_crema, scores, get_confidence_interval
 from pathlib import Path
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-#Calculate F1-Score, Precision & Recall and return DataFrame
+#Calculate F1-Score & Recall and return DataFrame
 def get_metrics(bootstrap_path):
     #bootstrap_path = 'predictions_bootstrap'
     target_intended_observed_ls = []
@@ -16,7 +16,6 @@ def get_metrics(bootstrap_path):
     bootstrap_ls = []
     subset_ls = []
     f1_score = []
-    precision = []
     recall = []
     
     data_path = Path(bootstrap_path)
@@ -71,18 +70,18 @@ def get_metrics(bootstrap_path):
             model_ls.append(model)
             subset_ls.append(subset)
             bootstrap_ls.append(bootstrap)
-            f1_score.append(macro_avg_score(y_true, y_pred)['f1-score'])
-            precision.append(macro_avg_score(y_true, y_pred)['precision'])
-            recall.append(macro_avg_score(y_true, y_pred)['recall'])
-        
-        
+
+            scores_dict = scores(y_true, y_pred)
+            f1_score.append(scores_dict['f1-score'])
+            recall.append(scores_dict['recall'])
+
+
     f1_df = pd.DataFrame(data=zip(target_intended_observed_ls,
                                       model_intended_observed_ls,
                                       model_ls,
                                       bootstrap_ls,
                                       subset_ls,
                                       f1_score,
-                                      precision,
                                       recall), 
                              columns=['target_intended_observed',
                                       'model_intended_observed',
@@ -90,7 +89,6 @@ def get_metrics(bootstrap_path):
                                       'bootstrap', 
                                       'subset',
                                       'f1_score',
-                                      'precision',
                                       'recall'])
     return f1_df
 
