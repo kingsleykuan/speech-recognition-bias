@@ -64,7 +64,7 @@ def get_confidence_interval(df, alpha):
     #Subset Df
     target_intended_observed_unique = ['intended', 'observed']
     model_intended_observed_unique = ['intended', 'observed']
-    model_unique = ['cnn_lstm', 'cnn_lstm_attention', 'cnn_lstm_attention_multitask']
+    model_unique = ['svm', 'cnn_lstm', 'cnn_lstm_attention', 'cnn_lstm_attention_multitask']
     subset_unique = ['male', 'female', 'cauc', 'non-cauc']
     
     for i in target_intended_observed_unique:   
