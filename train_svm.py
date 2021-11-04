@@ -1,189 +1,176 @@
-from glob import glob
-import os
 import pickle
-import itertools
-import pandas as pd
-import numpy as np
+from pathlib import Path
 
-### Warning import ###
+import numpy as np
+import pandas as pd
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import SelectKBest
+from sklearn.metrics import classification_report
+from sklearn.model_selection import GridSearchCV
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.utils import resample
+from tqdm import tqdm
+
+# Warning import #
 import warnings
 warnings.filterwarnings('ignore')
 
-### Graph imports ###
-import matplotlib.pyplot as plt
+TRAIN_DATA_PATH = 'Data/svm_features/train.p'
+TEST_DATA_PATH = 'Data/svm_features/test.p'
+OUTPUT_PATH = 'predictions_bootstrap/observed/svm/svm.csv'
+INTENDED_OBSERVED = 'observed'
+USE_BOOTSTRAP = True
+NUM_BOOTSTRAP_SAMPLES = 100
+EMOTIONS = (
+    'Anger',
+    'Disgust',
+    'Fear',
+    'Happy',
+    'Neutral',
+    'Sad',
+)
 
-### Sklearn imports ###
-from sklearn.utils import shuffle
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import KFold
-from sklearn.model_selection import GridSearchCV
-from sklearn.svm import SVC
-from sklearn.decomposition import PCA
-from sklearn.feature_selection import SelectKBest
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import accuracy_score
 
-from sklearn.metrics import classification_report
-from sklearn.multioutput import MultiOutputClassifier
+def hyperparameter_search(X_train, y_train):
+    # Set C and Gamma parameters list
+    G_list = [0.001, 0.005, 0.01, 0.125]
+    C_list = [1, 2, 3, 4, 5, 7, 10, 20, 50, 128]
 
-# Load datas from pickle
-[X_train, y_train] = pickle.load(open("/content/drive/MyDrive/IS4152/Data/SVM_features/CREMA_preprocessing_train.p", 'rb'))
-[X_test, y_test] = pickle.load(open("/content/drive/MyDrive/IS4152/Data/SVM_features/CREMA_preprocessing_test.p", 'rb'))
+    # Set the parameters for cross-validation
+    parameters = [
+        {
+            'estimator__kernel': ['rbf'],
+            'estimator__C': C_list,
+            'estimator__gamma': G_list
+        }]
 
-# Scale train and test dataset
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+    # Initialize SVM model
+    model = MultiOutputClassifier(SVC(decision_function_shape='ovr'))
 
-multi_selected_features = []
+    # Cross Validation
+    # add fit to find best parameters
+    cv = GridSearchCV(
+        model, parameters, cv=3, verbose=0, n_jobs=-1, refit=True) \
+        .fit(X_train, y_train)
 
-for i in range(len(y_train[0])):
-    # k-highest scores analysis on features
-    Kbest = SelectKBest(k="all")
-    selected_features = Kbest.fit(X_train, y_train[:,i])
-    multi_selected_features.append(selected_features)
+    # Print Best parameters
+    print("Best parameters set found on train set:")
+    print(cv.best_params_)
 
-multi_selected_features = [selected_features.pvalues_ for selected_features in multi_selected_features]
-multi_selected_features = np.asarray(multi_selected_features)
 
-multi_selected_features = np.min(multi_selected_features, axis=0)
+def train_predict(
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        filenames_test,
+        output_path):
+    # Scale train and test dataset
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
 
-# Plot P-values
-plt.figure(figsize=(20, 10))
-plt.plot(multi_selected_features)
-plt.title("p-values for each features", fontsize=22)
-plt.xlabel("Features")
-plt.ylabel("P-value")
-plt.show()
+    # Feature selection
+    multi_selected_features = []
+    for i in range(len(y_train[0])):
+        # k-highest scores analysis on features
+        Kbest = SelectKBest(k="all")
+        selected_features = Kbest.fit(X_train, y_train[:, i])
+        multi_selected_features.append(selected_features)
+    multi_selected_features = [
+        selected_features.pvalues_
+        for selected_features in multi_selected_features]
+    multi_selected_features = np.asarray(multi_selected_features)
+    multi_selected_features = np.min(multi_selected_features, axis=0)
 
-# Display Comment
-alpha = 0.01
-print("Number of p-values > à 1% : {}".format(np.sum(multi_selected_features > alpha)))
+    alpha = 0.01
+    print("Number of p-values > à 1% : {}".format(
+        np.sum(multi_selected_features > alpha)))
 
-# Remove non-significant features
-X_train = X_train[:,np.where(multi_selected_features < alpha)[0]]
-X_test = X_test[:,np.where(multi_selected_features < alpha)[0]]
+    # Remove non-significant features
+    X_train = X_train[:, np.where(multi_selected_features < alpha)[0]]
+    X_test = X_test[:, np.where(multi_selected_features < alpha)[0]]
 
-# Covariance matrix
-cov = pd.DataFrame(X_train).cov()
+    # Initialize PCA
+    pca = PCA(n_components=140)
 
-# Eigen values of covariance matrix
-eig = np.linalg.svd(cov)[1]
+    # Apply PCA on train and test set
+    X_train = pca.fit_transform(X_train)
+    X_test = pca.transform(X_test)
 
-# Plot eigen graph
-fig = plt.figure(figsize=(20, 10))
-plt.title('Decrease of covariance matrix eigen values', fontsize = 22)
-plt.plot(eig, '-*', label = "eig-value")
-plt.legend(loc = 'upper right')
-plt.show()
+    # hyperparameter_search(X_train, y_train)
 
-# Initialize PCA
-pca = PCA(n_components=140)
+    # Fit best
+    model = MultiOutputClassifier(SVC(
+        kernel='rbf', C=10, gamma=0.005, decision_function_shape='ovr')) \
+        .fit(X_train, y_train)
 
-# Apply PCA on train and test set
-X_train = pca.fit_transform(X_train)
-X_test = pca.transform(X_test)
+    # Prediction
+    pred = model.predict(X_test)
 
-# Hyperparameter tuning, takes a very long time to run
+    print(classification_report(y_test, pred, zero_division=0))
 
-# Set C and Gamma parameters list
-G_list = [0.001, 0.005, 0.01, 0.125]
-C_list = [1, 2, 3, 4, 5, 7, 10, 20, 128]
-# G_list = [1, 0.1, 0.01 , 0.001, 0.0001]
-# C_list = [0.1, 1, 10, 100, 1000]
+    data = pd.DataFrame(pred, columns=EMOTIONS)
+    data.insert(0, 'Filename', filenames_test)
 
-# Set the parameters for cross-validation
-parameters = [{'estimator__kernel': ['rbf'], 'estimator__C': C_list, 'estimator__gamma': G_list}]
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    data.to_csv(output_path, header=True, index=False)
 
-# Initialize SVM model
-model = MultiOutputClassifier(SVC(decision_function_shape='ovr'))
 
-# Cross Validation 
-# add fit to find best parameters
-cv = GridSearchCV(model, parameters, cv=3, verbose=0, n_jobs=-1, refit=True).fit(X_train, y_train)
+def main():
+    # Load datas from pickle
+    with open(TRAIN_DATA_PATH, 'rb') as file:
+        data = pickle.load(file)
+        filenames_train = data['filenames']
+        X_train = data['features']
+        y_train = data['{}_label_vectors'.format(INTENDED_OBSERVED)]
 
-# Print Best parameters
-print("Best parameters set found on train set:")
-print(cv.best_params_)
+    if not USE_BOOTSTRAP:
+        with open(TEST_DATA_PATH, 'rb') as file:
+            data = pickle.load(file)
+            filenames_test = data['filenames']
+            X_test = data['features']
+            y_test = data['{}_label_vectors'.format(INTENDED_OBSERVED)]
 
-# Confusion matrix plot function
-def plot_confusion_matrix(cm, classes,
-                          normalize=False,
-                          title='Confusion matrix',
-                          cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    """
-    if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        train_predict(
+            X_train, y_train, X_test, y_test, filenames_test, OUTPUT_PATH)
+    else:
+        for i in tqdm(range(NUM_BOOTSTRAP_SAMPLES)):
+            bootstrap_indices = resample(
+                list(range(len(X_train))),
+                replace=True,
+                n_samples=len(X_train),
+                random_state=i)
+            out_of_bootstrap_indices = \
+                set(range(len(X_train))) - set(bootstrap_indices)
 
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title, fontsize=22)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
+            filenames_test_oob = [
+                filenames_train[i] for i in out_of_bootstrap_indices]
+            X_test_oob = np.asarray([
+                X_train[i] for i in out_of_bootstrap_indices])
+            y_test_oob = np.asarray([
+                y_train[i] for i in out_of_bootstrap_indices])
 
-    fmt = '.2f' if normalize else 'd'
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
+            X_train_bootstrap = np.asarray([
+                X_train[i] for i in bootstrap_indices])
+            y_train_bootstrap = np.asarray([
+                y_train[i] for i in bootstrap_indices])
 
-    plt.ylabel('True label', fontsize=18)
-    plt.xlabel('Predicted label', fontsize=18)
-    plt.tight_layout()
+            output_path = Path(OUTPUT_PATH)
+            output_path = output_path.parent \
+                / (output_path.stem + f'_{i}' + output_path.suffix)
 
-# Fit best mode
-model = MultiOutputClassifier(SVC(kernel='rbf', C=1, gamma=0.005, decision_function_shape='ovr')).fit(X_train, y_train)
+            train_predict(
+                X_train_bootstrap,
+                y_train_bootstrap,
+                X_test_oob,
+                y_test_oob,
+                filenames_test_oob,
+                output_path)
 
-# Prediction
-pred = model.predict(X_test)
 
-# Score
-score = model.score(X_test, y_test)
-
-# Build dataFrame
-# df_pred = pd.DataFrame({'Actual': y_test, 'Prediction': score})
-
-# Print Score
-print('Accuracy Score on test dataset: {}%'.format(np.round(100 * score,2)))
-
-print(classification_report(y_test, pred, zero_division=0))
-
-# # Compute confusion matrix
-# confusion = confusion_matrix(y_test, pred)
-
-# # Plot non-normalized confusion matrix
-# plt.figure(figsize=(15, 15))
-# plot_confusion_matrix(confusion, classes=set(y_test),normalize=True,
-#                       title='Confusion matrix on train set with gender differentiation')
-
-# save the model to local
-pickle.dump(model, open('/content/gdrive/MyDrive/IS4152/Data/SVM_model/acted/Test_MODEL_CLASSIFIER.p', 'wb'))
-
-# Save label encoder
-#pickle.dump(lb, open("/content/gdrive/MyDrive/IS4152/Data/SVM_model/MODEL_ENCODER.p", "wb"))
-
-# Save PCA
-pickle.dump(pca, open("/content/gdrive/MyDrive/IS4152/Data/SVM_model/acted/Test_MODEL_PCA.p", "wb"))
-
-# Save MEAN and STD of each features
-MEAN = multi_selected_features.mean(axis=0)
-STD = multi_selected_features.std(axis=0)
-pickle.dump([MEAN, STD], open("/content/gdrive/MyDrive/IS4152/Data/SVM_model/acted/Test_MODEL_SCALER.p", "wb"))
-
-# Save feature parameters
-stats = ['mean', 'std', 'kurt', 'skew', 'q1', 'q99']
-features_list = ['zcr', 'energy', 'energy_entropy', 'spectral_centroid', 'spectral_spread', 'spectral_entropy', 'spectral_flux', 'sprectral_rolloff']
-win_step = 0.01
-win_size = 0.025
-nb_mfcc = 12
-diff = 0
-PCA = True
-DICO = {'stats':stats, 'features_list':features_list, 'win_size':win_size, 'win_step':win_step, 'nb_mfcc':nb_mfcc, 'diff':diff, 'PCA':PCA}
-pickle.dump(DICO, open("/content/gdrive/MyDrive/IS4152/Data/SVM_model/acted/Test_MODEL_PARAM.p", "wb"))
+if __name__ == '__main__':
+    main()
