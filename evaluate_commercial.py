@@ -14,9 +14,19 @@ def get_metrics(pred_path):
     target_intended_observed_ls = []
     model_ls = []
     subset_ls = []
+
     f1_score = []
+    f1_score_anger = []
+    f1_score_happy = []
+    f1_score_neutral = []
+    f1_score_sad = []
+
     recall = []
-    
+    recall_anger = []
+    recall_happy = []
+    recall_neutral = []
+    recall_sad = []
+
     data_path = Path(pred_path)
     paths = [path for path in data_path.glob('**/*') if path.is_file()]
     paths.sort()
@@ -72,20 +82,49 @@ def get_metrics(pred_path):
             subset_ls.append(subset)
 
             scores_dict = scores(y_true, y_pred)
-            f1_score.append(scores_dict['f1-score'])
-            recall.append(scores_dict['recall'])
+
+            f1_score.append(scores_dict['macro avg']['f1-score'])
+            f1_score_anger.append(scores_dict['0']['f1-score'])
+            f1_score_happy.append(scores_dict['1']['f1-score'])
+            f1_score_neutral.append(scores_dict['2']['f1-score'])
+            f1_score_sad.append(scores_dict['3']['f1-score'])
+
+            recall.append(scores_dict['macro avg']['recall'])
+            recall_anger.append(scores_dict['0']['recall'])
+            recall_happy.append(scores_dict['1']['recall'])
+            recall_neutral.append(scores_dict['2']['recall'])
+            recall_sad.append(scores_dict['3']['recall'])
 
 
-    f1_df = pd.DataFrame(data=zip(target_intended_observed_ls,
-                                      model_ls,
-                                      subset_ls,
-                                      f1_score,
-                                      recall), 
-                             columns=['target_intended_observed',
-                                      'model', 
-                                      'subset',
-                                      'f1_score',
-                                      'recall'])
+    f1_df = pd.DataFrame(
+        data=zip(
+            target_intended_observed_ls,
+            model_ls,
+            subset_ls,
+            f1_score,
+            f1_score_anger,
+            f1_score_happy,
+            f1_score_neutral,
+            f1_score_sad,
+            recall,
+            recall_anger,
+            recall_happy,
+            recall_neutral,
+            recall_sad),
+        columns=[
+            'target_intended_observed',
+            'model',
+            'subset',
+            'f1_score',
+            'f1_score_anger',
+            'f1_score_happy',
+            'f1_score_neutral',
+            'f1_score_sad',
+            'recall',
+            'recall_anger',
+            'recall_happy',
+            'recall_neutral',
+            'recall_sad'])
     return f1_df
 
 
@@ -95,4 +134,4 @@ if __name__ == '__main__':
     output_path = Path('bias_results/commercial/commercial_models.csv')
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    df.to_csv(output_path, index = False)
+    df.to_csv(output_path, index = False, float_format='%.5f')
