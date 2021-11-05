@@ -1,13 +1,13 @@
 """
 Compare Our models with mean, std, CI over the 100 bootstrapped sets
 """
-from evaluate import get_test_set_filenames, preprocess_crema, macro_avg_score, get_confidence_interval
+from evaluate import get_test_set_filenames, preprocess_crema, scores, get_confidence_interval
 from pathlib import Path
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-#Calculate F1-Score, Precision & Recall and return DataFrame
+#Calculate F1-Score & Recall and return DataFrame
 def get_metrics(bootstrap_path):
     #bootstrap_path = 'predictions_bootstrap'
     target_intended_observed_ls = []
@@ -15,10 +15,23 @@ def get_metrics(bootstrap_path):
     model_ls = []
     bootstrap_ls = []
     subset_ls = []
+
     f1_score = []
-    precision = []
+    f1_score_anger = []
+    f1_score_disgust = []
+    f1_score_fear = []
+    f1_score_happy = []
+    f1_score_neutral = []
+    f1_score_sad = []
+
     recall = []
-    
+    recall_anger = []
+    recall_disgust = []
+    recall_fear = []
+    recall_happy = []
+    recall_neutral = []
+    recall_sad = []
+
     data_path = Path(bootstrap_path)
     paths = [path for path in data_path.glob('**/*') if path.is_file()]
     paths.sort()
@@ -71,27 +84,67 @@ def get_metrics(bootstrap_path):
             model_ls.append(model)
             subset_ls.append(subset)
             bootstrap_ls.append(bootstrap)
-            f1_score.append(macro_avg_score(y_true, y_pred)['f1-score'])
-            precision.append(macro_avg_score(y_true, y_pred)['precision'])
-            recall.append(macro_avg_score(y_true, y_pred)['recall'])
-        
-        
-    f1_df = pd.DataFrame(data=zip(target_intended_observed_ls,
-                                      model_intended_observed_ls,
-                                      model_ls,
-                                      bootstrap_ls,
-                                      subset_ls,
-                                      f1_score,
-                                      precision,
-                                      recall), 
-                             columns=['target_intended_observed',
-                                      'model_intended_observed',
-                                      'model', 
-                                      'bootstrap', 
-                                      'subset',
-                                      'f1_score',
-                                      'precision',
-                                      'recall'])
+
+            scores_dict = scores(y_true, y_pred)
+
+            f1_score.append(scores_dict['macro avg']['f1-score'])
+            f1_score_anger.append(scores_dict['0']['f1-score'])
+            f1_score_disgust.append(scores_dict['1']['f1-score'])
+            f1_score_fear.append(scores_dict['2']['f1-score'])
+            f1_score_happy.append(scores_dict['3']['f1-score'])
+            f1_score_neutral.append(scores_dict['4']['f1-score'])
+            f1_score_sad.append(scores_dict['5']['f1-score'])
+
+            recall.append(scores_dict['macro avg']['recall'])
+            recall_anger.append(scores_dict['0']['recall'])
+            recall_disgust.append(scores_dict['1']['recall'])
+            recall_fear.append(scores_dict['2']['recall'])
+            recall_happy.append(scores_dict['3']['recall'])
+            recall_neutral.append(scores_dict['4']['recall'])
+            recall_sad.append(scores_dict['5']['recall'])
+
+
+    f1_df = pd.DataFrame(
+        data=zip(
+            target_intended_observed_ls,
+            model_intended_observed_ls,
+            model_ls,
+            bootstrap_ls,
+            subset_ls,
+            f1_score,
+            f1_score_anger,
+            f1_score_disgust,
+            f1_score_fear,
+            f1_score_happy,
+            f1_score_neutral,
+            f1_score_sad,
+            recall,
+            recall_anger,
+            recall_disgust,
+            recall_fear,
+            recall_happy,
+            recall_neutral,
+            recall_sad),
+        columns=[
+            'target_intended_observed',
+            'model_intended_observed',
+            'model',
+            'bootstrap',
+            'subset',
+            'f1_score',
+            'f1_score_anger',
+            'f1_score_disgust',
+            'f1_score_fear',
+            'f1_score_happy',
+            'f1_score_neutral',
+            'f1_score_sad',
+            'recall',
+            'recall_anger',
+            'recall_disgust',
+            'recall_fear',
+            'recall_happy',
+            'recall_neutral',
+            'recall_sad'])
     return f1_df
 
 if __name__ == '__main__':    
@@ -99,8 +152,8 @@ if __name__ == '__main__':
 
     output_path = Path('bias_results/user/user_models_all.csv')
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(output_path, index = False)
+    df.to_csv(output_path, index = False, float_format='%.5f')
 
     output_path = Path('bias_results/user/user_models.csv')
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    get_confidence_interval(df, 0.95).to_csv(output_path, index = False) 
+    get_confidence_interval(df, 0.95).to_csv(output_path, index = False, float_format='%.5f')
