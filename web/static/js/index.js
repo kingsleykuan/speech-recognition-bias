@@ -218,6 +218,20 @@ function onload() {
             $('#race_bias_pic').attr('src', race_observed_src)
         }
     })
+    $('#gender_bias_pic').hover(function (e) {
+        var src = $(this).attr('src')
+        $('#gender_bias_pic_zoom').attr('src', src)
+        $('#gender_bias_pic_zoom').show()
+    }, function() {
+        $('#gender_bias_pic_zoom').hide()
+    })
+    $('#race_bias_pic').hover(function(e) {
+        var src = $(this).attr('src')
+        $('#race_bias_pic_zoom').attr('src', src)
+        $('#race_bias_pic_zoom').show()
+    }, function() {
+        $('#race_bias_pic_zoom').hide()
+    })
 }
 
 function updateCommercialResults(name, scores, state) {
