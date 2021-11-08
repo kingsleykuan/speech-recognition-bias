@@ -17,11 +17,11 @@
 
         @-webkit-keyframes glow {
             from {
-                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px bisque, 0 0 40px rgb(202, 190, 175), 0 0 50px rgb(189, 173, 154), 0 0 60px rgb(238, 200, 154), 0 0 70px bisque;
+                text-shadow: 0 0 10px #fff, 0 0 5px #fff, 0 0 10px bisque, 0 0 20px rgb(202, 190, 175), 0 0 40px rgb(189, 173, 154), 0 0 40px rgb(238, 200, 154), 0 0 50px bisque;
             }
 
             to {
-                text-shadow: 0 0 20px #fff, 0 0 30px bisque, 0 0 40px bisque, 0 0 50px bisque, 0 0 60px bisque, 0 0 70px bisque, 0 0 80px bisque;
+                text-shadow: 0 0 10px #fff, 0 0 10px bisque, 0 0 20px bisque, 0 0 30px bisque, 0 0 40px bisque, 0 0 50px bisque, 0 0 50px bisque;
             }
         }
 
@@ -31,9 +31,7 @@
             position: relative;
             width: 80%;
             margin: auto;
-            margin-top: 50px;
-            margin-bottom: 50px;
-            font-size: 18px;
+            font-size: 12px;
             overflow: hidden;
             display: table;
             background-color: transparent;
@@ -42,7 +40,7 @@
         #myTable th,
         #myTable td {
             text-align: left;
-            padding: 6px;
+            padding: 3px;
             background-color: transparent;
             color: whitesmoke;
             /* Add padding */
@@ -63,6 +61,29 @@
         .img_border {
             border: 8px solid #042d4e;
         }
+
+        .zoom_img {
+            background: #F8F8F8;
+            border: 5px solid #DFDFDF;
+            color: #717171;
+            font-size: 13px;
+            height: 30px;
+            letter-spacing: 1px;
+            line-height: 30px;
+            position: absolute;
+            top: 230px;
+            left: 220px;
+            width: 800px;
+            height: 520px;
+            margin: 0 auto;
+            text-align: center;
+            z-index: 120;
+            text-align: center;
+            text-transform: uppercase;
+            display: none;
+            padding: 0 20px;
+
+        }
     </style>
 </head>
 
@@ -77,27 +98,28 @@
         <div
             style="margin: 0 auto; width: 80%; padding-bottom: 20px; height: 100%; border-radius: 25px;border:10px; border-left-color: #000000;">
             <div
-                style="margin: 0; width: 80%; height:85%;background-color: #061929; opacity: 0.8; position:absolute;border-radius: 25px;border:10px; border-left-color: #000000;">
+                style="margin: 0; width: 80%; height:80%;background-color: #061929; opacity: 0.8; position:absolute;border-radius: 25px;border:10px; border-left-color: #000000;">
             </div>
             <div
-                style="margin: 0; width: 80%; height:85%;background-color: #0b518a; opacity: 0.8; position:absolute;border-radius: 25px;border:10px; border-left-color: #000000;">
+                style="margin: 0; width: 80%; height:80%;background-color: #0b518a; opacity: 0.8; position:absolute;border-radius: 25px;border:10px; border-left-color: #000000;">
             </div>
             <div style="position: absolute;padding: 20px;"> <input label="ck" name="ck_commerical" type="checkbox"
                     checked />
                 <label for="ck" style="color: navajowhite; font-size: 20px;">Commercial Models </label>
             </div>
-            <div class="card" style="margin: 0 auto; background-color:transparent; border: 0; ">
+            <div class="card" style="margin: 0 auto; background-color:transparent; border: 0; display: flexbox">
 
-                <div style="margin:0 auto">
-                    <p value="time" style="font-size:30px;color: bisque;">Ready! &#128540;</p>
+                <p value="time" style="font-size:30px;color: bisque;">Ready! &#128540;</p>
+                <div style="display: flex; margin: 0 auto;flex-direction:row;">
                     <p> <a href="#" style="text-decoration: none;" value="trigger">
-                            <p class="glow" style="font-size:60px;">&#127897;</p>
+                            <p class="glow" style="font-size:40px;">&#127897;</p>
                         </a></p>
+                    <audio id="audio" controls="controls" style="width: 0;">
+                        <source id="audioSource" src="">
+                        </source>
+                    </audio>
                 </div>
-                <audio id="audio" controls="controls" style="width: 100%;">
-                    <source id="audioSource" src="">
-                    </source>
-                </audio>
+
             </div>
             <!-- <p value="result">this is the result</p> -->
             <div style="margin-top: 0px; width:100%; display: flex;flex-direction:row;">
@@ -166,17 +188,19 @@
                 <div
                     style="margin-top:10px; display: inline-block;z-index: inherit;z-index: 100;height: 100%; width: 80%; text-align: center;">
                     <img class="img_border" id="gender_bias_pic"
-                        src="img/emotion/intended/gender_cnn_lstm_attention_f1_score.png" style="width:70%;" />
+                        src="img/emotion/intended/gender_cnn_lstm_attention_f1_score.png" style="width:50%;"></img>
+                        <img class="zoom_img" id="gender_bias_pic_zoom" src="img/emotion/intended/gender_cnn_lstm_attention_f1_score.png" />
                     <p style="z-index: 120; text-align: center; color: #fff;">Gender F1-Scores</p>
                     <img class="img_border" id="race_bias_pic"
-                        src="img/emotion/intended/gender_cnn_lstm_attention_f1_score.png" style="width:70%;" />
+                        src="img/emotion/intended/gender_cnn_lstm_attention_f1_score.png" style="width:50%;" />
+                        <img class="zoom_img" id="race_bias_pic_zoom" src="img/emotion/intended/gender_cnn_lstm_attention_f1_score.png" />
                     <p style="z-index: 120; text-align: center; color: #fff;">Race F1-Scores</p>
                 </div>
             </div>
         </div>
         <span class="toast" hidden>This is a toast message!</span>
     </div>
-    <footer style="background-color: #0C2D48; margin-top: 10px; ">
+    <footer style="background-color: #0C2D48; margin-top: 40px; ">
         <p style="color: cornsilk;"> Copyright 2021 &copy; By Team 1 IS5452/IS4152 NUS</p>
     </footer>
 </body>
