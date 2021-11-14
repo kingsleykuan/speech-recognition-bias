@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from base_model import BaseModel
+from ser_model.base_model import BaseModel
 
 
 class SimpleModel(BaseModel):

@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from AudioLibrary.AudioFeatures import AudioFeatures
 from AudioLibrary.AudioSignal import AudioSignal
-from crema_metadata import read_metadata, read_ratings
+from ser_data.crema_metadata import read_metadata, read_ratings
 
 # Sample rate (44.1 kHz)
 SAMPLE_RATE = 44100

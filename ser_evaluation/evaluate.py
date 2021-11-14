@@ -1,7 +1,7 @@
 from sklearn.metrics import classification_report
 import numpy as np
 import pandas as pd
-from crema_metadata import read_actor_demographics, parse_metadata, read_ratings
+from ser_data.crema_metadata import read_actor_demographics, parse_metadata, read_ratings
 import scipy.stats as st
 
 #Get the filenames of the test set.

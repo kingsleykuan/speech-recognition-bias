@@ -2,7 +2,7 @@
 Compare commercial models with mean, std, CI over the original test set split.
 """
 
-from evaluate import get_test_set_filenames, preprocess_crema, scores
+from ser_evaluation.evaluate import get_test_set_filenames, preprocess_crema, scores
 from pathlib import Path
 import numpy as np
 import pandas as pd

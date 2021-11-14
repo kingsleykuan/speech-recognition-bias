@@ -1,7 +1,7 @@
 """
 Compare Our models with mean, std, CI over the 100 bootstrapped sets
 """
-from evaluate import get_test_set_filenames, preprocess_crema, scores, get_confidence_interval
+from ser_evaluation.evaluate import get_test_set_filenames, preprocess_crema, scores, get_confidence_interval
 from pathlib import Path
 import numpy as np
 import pandas as pd

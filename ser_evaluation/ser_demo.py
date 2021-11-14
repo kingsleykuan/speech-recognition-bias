@@ -4,7 +4,7 @@ import librosa
 import numpy as np
 import torch
 
-from cnn_lstm_model import CNNLSTM2DModel
+from ser_model.cnn_lstm_model import CNNLSTM2DModel
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

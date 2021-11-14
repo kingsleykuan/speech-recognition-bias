@@ -7,7 +7,7 @@ from shutil import copy2
 
 from sklearn.model_selection import train_test_split
 
-from crema_metadata import read_actor_demographics, read_metadata
+from ser_data.crema_metadata import read_actor_demographics, read_metadata
 
 
 def arg_parser():
@@ -31,7 +31,8 @@ def arg_parser():
         type=float, help='Ratio of data to use for validation.')
 
     parser.add_argument(
-        '--train_val_test_split_path', default='train_val_test_split.json',
+        '--train_val_test_split_path',
+        default='ser_data/train_val_test_split.json',
         type=str, help="""Path to train val test split JSON file.
                           Will write to file if it does not exist.""")
 
@@ -111,6 +112,8 @@ def split_dataset(
 
     print("Test Demographics Statistics\n{}\n{}\n".format(
         len(test), test['sex_race'].value_counts()))
+
+    data_path = data_path.parent / f'{data_path.name}Split'
 
     # Copy data files according to split
     train_path = data_path / 'train'
