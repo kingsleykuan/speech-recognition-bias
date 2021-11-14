@@ -1,4 +1,6 @@
-# Speech Emotion Recognition Bias
+# Do Machines Discriminate? Examining the Hidden Gender and Racial Bias in Speech Emotion Recognition AI
+
+A IS4152 / IS5452: Affective Computing Project
 
 ## Setup
 Environment can be setup using Conda:
@@ -14,8 +16,10 @@ Please download and place in the `Data` folder.
 
 ## Code Demo
 Pre-trained model files are located in `models.zip`
+
 Predictions for models and commercial models are located in `predictions.zip`
-Sample data CREMA-D dataset is in `sample_data`
+
+Sample data from CREMA-D dataset is located in `sample_data`
 
 Demo of speech emotion recognition can be run with:
 ```
