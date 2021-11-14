@@ -90,3 +90,12 @@ python -m classify_emotions \
 --bootstrap_sampling \
 --num_bootstrap_samples 100
 ```
+
+
+## Authors
+
+* **Kingsley Kuan** - [kingsleykuan](https://github.com/kingsleykuan)
+* **Wong Wei Kang** - [wwongwk](https://github.com/wwongwk)
+* **Jeremy Sim** - [jemerysim](https://github.com/jemerysim)
+* **Shao Guoxin** - [gxshao](https://github.com/gxshao)
+* **Saja Alamoudi** - [saja-alamoudi](https://github.com/saja-alamoudi)
