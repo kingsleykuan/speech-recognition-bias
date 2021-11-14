@@ -9,9 +9,9 @@
   },
   "Lib": "lib/lib_linux64.so",
   "model_path": [
-	  {"acted_cnn_lstm" : "models/acted/cnn_lstm/"},
-          {"acted_cnn_lstm_attention" : "models/acted/cnn_lstm_attention/"},
-          {"acted_cnn_lstm_attention_multitask" : "models/acted/cnn_lstm_attention_multitask/"},
+	  {"acted_cnn_lstm" : "models/intended/cnn_lstm/"},
+          {"acted_cnn_lstm_attention" : "models/intended/cnn_lstm_attention/"},
+          {"acted_cnn_lstm_attention_multitask" : "models/intended/cnn_lstm_attention_multitask/"},
           {"observed_cnn_lstm" : "models/observed/cnn_lstm/"},
           {"observed_cnn_lstm_attention" : "models/observed/cnn_lstm_attention/"},
           {"observed_cnn_lstm_attention_multitask" : "models/observed/cnn_lstm_attention_multitask/"}

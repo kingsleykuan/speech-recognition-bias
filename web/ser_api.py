@@ -6,7 +6,7 @@ import json
 import io
 import os
 import copy
-from cnn_lstm_model import CNNLSTM2DModel
+from ser_model.cnn_lstm_model import CNNLSTM2DModel
 import audio_handler as ah
 import numpy as np
 import soundfile as sf
