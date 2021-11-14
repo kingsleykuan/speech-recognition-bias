@@ -54,67 +54,67 @@ python -m ser_train.train_cnn_lstm_model
 ## Train SVM
 python -m ser_train.train_svm
 
-
-
+## Speech Emotion Recognition Demo
+```
+python -m ser_evaluation.ser_demo \
+--model_path 'models/intended/cnn_lstm_attention_multitask' \
+--audio_path 'Data/AudioWAV/1001_DFA_ANG_XX.wav'
+```
 
 ## Classify Emotions
 ```
-python -m classify_emotions \
---model_path 'models/acted/cnn_lstm' \
---output_path 'predictions/acted/cnn_lstm.csv'
+python -m ser_evaluation.classify_emotions \
+--model_path 'models/intended/cnn_lstm' \
+--output_path 'predictions/intended/cnn_lstm.csv'
 ```
 
 ```
-python -m classify_emotions \
---model_path 'models/acted/cnn_lstm_attention' \
---output_path 'predictions/acted/cnn_lstm_attention.csv'
+python -m ser_evaluation.classify_emotions \
+--model_path 'models/intended/cnn_lstm_attention' \
+--output_path 'predictions/intended/cnn_lstm_attention.csv'
 ```
 
 ```
-python -m classify_emotions \
---model_path 'models/acted/cnn_lstm_attention_multitask' \
---output_path 'predictions/acted/cnn_lstm_attention_multitask.csv' \
+python -m ser_evaluation.classify_emotions \
+--model_path 'models/intended/cnn_lstm_attention_multitask' \
+--output_path 'predictions/intended/cnn_lstm_attention_multitask.csv' \
 --predict_gender \
 --predict_race
 ```
 
-## Speech Emotion Recognition Demo
-```
-python -m ser_demo \
---model_path 'models/acted/cnn_lstm_attention_multitask' \
---audio_path 'Data/AudioWAV/1001_DFA_ANG_XX.wav'
-```
-
 ## Classify Emotions with Bootstrap Sampling
 ```
-python -m classify_emotions \
+python -m ser_evaluation.classify_emotions \
 --data_path 'Data/MelSpecSplit/train' \
---model_path 'models/intended/cnn_lstm' \
---output_path 'predictions/intended/cnn_lstm.csv' \
+--model_path 'models_bootstrap/intended/cnn_lstm/cnn_lstm' \
+--output_path 'predictions_bootstrap/intended/cnn_lstm/cnn_lstm.csv' \
 --bootstrap_sampling \
 --num_bootstrap_samples 100
 ```
 
 ```
-python -m classify_emotions \
+python -m ser_evaluation.classify_emotions \
 --data_path 'Data/MelSpecSplit/train' \
---model_path 'models/intended/cnn_lstm_attention' \
---output_path 'predictions/intended/cnn_lstm_attention.csv' \
+--model_path 'models_bootstrap/intended/cnn_lstm_attention/cnn_lstm_attention' \
+--output_path 'predictions_bootstrap/intended/cnn_lstm_attention/cnn_lstm_attention.csv' \
 --bootstrap_sampling \
 --num_bootstrap_samples 100
 ```
 
 ```
-python -m classify_emotions \
+python -m ser_evaluation.classify_emotions \
 --data_path 'Data/MelSpecSplit/train' \
---model_path 'models/intended/cnn_lstm_attention_multitask' \
---output_path 'predictions/intended/cnn_lstm_attention_multitask.csv' \
+--model_path 'models_bootstrap/intended/cnn_lstm_attention_multitask/cnn_lstm_attention_multitask' \
+--output_path 'predictions_bootstrap/intended/cnn_lstm_attention_multitask/cnn_lstm_attention_multitask.csv' \
 --predict_gender \
 --predict_race \
 --bootstrap_sampling \
 --num_bootstrap_samples 100
 ```
 
+## Evaluate Predictions
+python -m ser_evaluation.evaluate_user
+python -m ser_evaluation.evaluate_commercial
 
 ## Authors
 

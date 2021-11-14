@@ -8,9 +8,9 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from cnn_lstm_model import CNNLSTM2DModel
-from crema_data import CremaAudioDataset
-from utils import recursive_to_device
+from ser_model.cnn_lstm_model import CNNLSTM2DModel
+from ser_data.crema_data import CremaAudioDataset
+from ser_train.utils import recursive_to_device
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
