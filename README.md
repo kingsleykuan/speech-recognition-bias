@@ -7,6 +7,40 @@ conda env create -f environment.yml
 conda activate ser-bias
 ```
 
+## Preprocess Dataset
+Split Dataset
+```
+python -m ser_preprocess.split_dataset \
+--data_path 'Data/AudioWAV' \
+--demographics_csv_path 'Data/VideoDemographics.csv' \
+--train_size 0.8 \
+--val_size 0.1 \
+--train_val_test_split_path 'ser_data/train_val_test_split.json'
+```
+
+Preprocess Log Mel Spectrograms
+```
+python -m ser_preprocess.log_mel_spec_extraction
+```
+
+Preprocess SVM Features
+```
+python -m ser_preprocess.preprocess_svm_data \
+--data_path 'Data/AudioWAVSplit/train' \
+--ratings_path 'Data/processedResults/summaryTable.csv' \
+--output_path 'Data/svm_features/train.p'
+
+python -m ser_preprocess.preprocess_svm_data \
+--data_path 'Data/AudioWAVSplit/val' \
+--ratings_path 'Data/processedResults/summaryTable.csv' \
+--output_path 'Data/svm_features/val.p'
+
+python -m ser_preprocess.preprocess_svm_data \
+--data_path 'Data/AudioWAVSplit/test' \
+--ratings_path 'Data/processedResults/summaryTable.csv' \
+--output_path 'Data/svm_features/test.p'
+```
+
 ## Train Simple Model
 ```
 python -m train_simple_model
