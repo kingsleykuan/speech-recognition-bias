@@ -1,8 +1,8 @@
 import torch
 from sklearn.metrics import classification_report, f1_score
 
-from trainer import Trainer
-from utils import recursive_to_device
+from ser_train.trainer import Trainer
+from ser_train.utils import recursive_to_device
 
 
 class SpeechEmotionRecognitionTrainer(Trainer):

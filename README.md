@@ -43,29 +43,19 @@ python -m ser_preprocess.preprocess_svm_data \
 
 ## Train Simple Model
 ```
-python -m train_simple_model
+python -m ser_train.train_simple_model
 ```
 
 ## Train 2D CNN LSTM Model
 ```
-python -m train_cnn_lstm_model
+python -m ser_train.train_cnn_lstm_model
 ```
 
-## Models Trained on Acted Emotion Labels (Validation Set)
-| Model                        | Macro F1-Score |
-|------------------------------|----------------|
-| Dense                        | 0.50927        |
-| CNN LSTM                     | 0.65964        |
-| CNN LSTM Attention           | 0.66651        |
-| CNN LSTM Attention Multitask | 0.68006        |
+## Train SVM
+python -m ser_train.train_svm
 
-## Models Trained on Observed Emotion Labels (Validation Set)
-| Model                        | Macro F1-Score |
-|------------------------------|----------------|
-| Dense                        | 0.45105        |
-| CNN LSTM                     | 0.50542        |
-| CNN LSTM Attention           | 0.51589        |
-| CNN LSTM Attention Multitask | 0.51678        |
+
+
 
 ## Classify Emotions
 ```

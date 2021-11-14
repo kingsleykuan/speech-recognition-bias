@@ -5,9 +5,9 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from crema_data import CremaAudioDataset
-from ser_trainer import SpeechEmotionRecognitionTrainer
-from simple_model import SimpleModel
+from ser_data.crema_data import CremaAudioDataset
+from ser_model.simple_model import SimpleModel
+from ser_train.ser_trainer import SpeechEmotionRecognitionTrainer
 
 NUM_BOOTSTRAP_SAMPLES = 100
 CONFIG = {

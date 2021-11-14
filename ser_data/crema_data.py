@@ -4,7 +4,8 @@ import numpy as np
 from sklearn.utils import resample
 from torch.utils.data import Dataset
 
-from crema_metadata import read_actor_demographics, read_metadata, read_ratings
+from ser_data.crema_metadata import (
+    read_actor_demographics, read_metadata, read_ratings)
 
 EMOTIONS = (
     'Anger',
