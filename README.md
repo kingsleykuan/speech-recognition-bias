@@ -12,6 +12,18 @@ Dataset is available at: https://github.com/CheyneyComputerScience/CREMA-D
 
 Please download and place in the `Data` folder.
 
+## Code Demo
+Pre-trained model files are located in `models.zip`
+Predictions for models and commercial models are located in `predictions.zip`
+Sample data CREMA-D dataset is in `sample_data`
+
+Demo of speech emotion recognition can be run with:
+```
+python -m ser_evaluation.ser_demo \
+--model_path 'models/observed/cnn_lstm_attention_multitask' \
+--audio_path 'sample_data/1001_DFA_ANG_XX.wav'
+```
+
 ## Preprocess Dataset
 Split Dataset
 ```
