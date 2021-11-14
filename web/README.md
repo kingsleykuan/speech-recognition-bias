@@ -33,7 +33,9 @@ And 6 bias recognition [`models`](https://github.com/wwongwk/speech-recognition-
   <li>Urllib3</li>
   <li>Urllib3</li>
 </ul> 
-2. Check your [`models`](https://github.com/wwongwk/speech-recognition-bias/blob/main/README.md) directories whether it is exists.
+ 
+2. Check your [`models`](https://github.com/wwongwk/speech-recognition-bias/blob/main/README.md) directory whether it is exists.
+ 
 3. Clone project and into `web` folder, run:
   ```bash
   $ python server.py
@@ -48,6 +50,7 @@ You can modify the `config.json` in order to make sure the server running proper
     "deepaffect": "..."
   }
 ```
+ 
 If you running `server.py` on `arm64` device, you can change the lib to:
 ```json
 "Lib": "lib/lib_arm64.so"
